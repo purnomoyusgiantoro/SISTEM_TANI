@@ -1,0 +1,446 @@
+import { useState, useMemo } from 'react';
+import { useAuth } from '../context/AuthContext';
+import {
+  dataKegiatan, jenisKegiatan, dataLahan, formatTanggal,
+} from '../data/mockData';
+import {
+  Plus, Search, Filter, X, Calendar, ChevronLeft, ChevronRight,
+  Camera, FileText, Clock, Sprout, Droplet, Wind, Wheat, Hammer, Wrench, MapPin
+} from 'lucide-react';
+
+/* ── helpers ── */
+function getJenisConfig(value) {
+  return jenisKegiatan.find((j) => j.value === value) || { label: value, icon: 'kegiatan', color: '#6b7280' };
+}
+
+function renderKegiatanIcon(code, size = 18) {
+  switch (code) {
+    case 'tanam':
+      return <Sprout size={size} />;
+    case 'pupuk':
+      return <Droplet size={size} style={{ transform: 'rotate(180deg)' }} />;
+    case 'semprot':
+      return <Wind size={size} />;
+    case 'panen':
+      return <Wheat size={size} />;
+    case 'olah':
+      return <Hammer size={size} />;
+    case 'irigasi':
+      return <Droplet size={size} />;
+    case 'rawat':
+      return <Wrench size={size} />;
+    default:
+      return <FileText size={size} />;
+  }
+}
+
+function groupByDate(items) {
+  const groups = {};
+  items.forEach((item) => {
+    if (!groups[item.tanggal]) groups[item.tanggal] = [];
+    groups[item.tanggal].push(item);
+  });
+  return Object.entries(groups)
+    .sort(([a], [b]) => new Date(b) - new Date(a));
+}
+
+/* ── Modal ── */
+function Modal({ open, onClose, title, children }) {
+  if (!open) return null;
+  return (
+    <div className="kegiatan-modal-overlay" onClick={onClose}>
+      <div className="kegiatan-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="kegiatan-modal-header">
+          <h3>{title}</h3>
+          <button className="kegiatan-modal-close" onClick={onClose}><X size={20} /></button>
+        </div>
+        <div className="kegiatan-modal-body">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Simple Calendar ── */
+function MiniCalendar({ activityDates }) {
+  const [viewDate, setViewDate] = useState(new Date());
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today = new Date();
+
+  const monthNames = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+  ];
+  const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+
+  const activitySet = new Set(activityDates);
+
+  const prevMonth = () => setViewDate(new Date(year, month - 1, 1));
+  const nextMonth = () => setViewDate(new Date(year, month + 1, 1));
+
+  const cells = [];
+  for (let i = 0; i < firstDay; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  return (
+    <div className="kegiatan-calendar">
+      <div className="kegiatan-calendar-header">
+        <button onClick={prevMonth} className="kegiatan-calendar-nav"><ChevronLeft size={18} /></button>
+        <span className="kegiatan-calendar-title">{monthNames[month]} {year}</span>
+        <button onClick={nextMonth} className="kegiatan-calendar-nav"><ChevronRight size={18} /></button>
+      </div>
+      <div className="kegiatan-calendar-grid">
+        {dayNames.map((d) => (
+          <div key={d} className="kegiatan-calendar-day-name">{d}</div>
+        ))}
+        {cells.map((day, i) => {
+          if (day === null) return <div key={`e-${i}`} className="kegiatan-calendar-cell empty" />;
+          const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
+          const hasActivity = activitySet.has(dateStr);
+          return (
+            <div
+              key={day}
+              className={`kegiatan-calendar-cell${isToday ? ' today' : ''}${hasActivity ? ' has-activity' : ''}`}
+            >
+              {day}
+              {hasActivity && <span className="kegiatan-calendar-dot" />}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════ MAIN COMPONENT ══════════════ */
+export default function Kegiatan() {
+  const { currentUser, hasPermission } = useAuth();
+  const role = currentUser?.role || 'petani';
+  const canAdd = role === 'petani' || role === 'pengurus';
+
+  const [kegiatan, setKegiatan] = useState(dataKegiatan);
+  const [showModal, setShowModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterJenis, setFilterJenis] = useState('');
+  const [filterDateFrom, setFilterDateFrom] = useState('');
+  const [filterDateTo, setFilterDateTo] = useState('');
+
+  /* form state */
+  const [formTanggal, setFormTanggal] = useState('');
+  const [formJenis, setFormJenis] = useState('');
+  const [formLahan, setFormLahan] = useState('');
+  const [formDeskripsi, setFormDeskripsi] = useState('');
+  const [formFoto, setFormFoto] = useState(null);
+
+  /* ── filter ── */
+  const filtered = useMemo(() => {
+    let list = [...kegiatan];
+    if (role === 'petani') list = list.filter((k) => k.petaniId === currentUser?.id);
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (k) => k.deskripsi.toLowerCase().includes(q) || k.petani.toLowerCase().includes(q) || k.lokasi.toLowerCase().includes(q)
+      );
+    }
+    if (filterJenis) list = list.filter((k) => k.jenis === filterJenis);
+    if (filterDateFrom) list = list.filter((k) => k.tanggal >= filterDateFrom);
+    if (filterDateTo) list = list.filter((k) => k.tanggal <= filterDateTo);
+    return list.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+  }, [kegiatan, searchQuery, filterJenis, filterDateFrom, filterDateTo, role, currentUser]);
+
+  const grouped = groupByDate(filtered);
+  const activityDates = filtered.map((k) => k.tanggal);
+
+  /* userLahan */
+  const userLahan = useMemo(() => {
+    if (role === 'petani') return dataLahan.filter((l) => l.pemilikId === currentUser?.id);
+    return dataLahan;
+  }, [role, currentUser]);
+
+  /* ── submit ── */
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const lahan = dataLahan.find((l) => l.id === Number(formLahan));
+    const newItem = {
+      id: kegiatan.length + 1,
+      petaniId: currentUser?.id || 1,
+      petani: currentUser?.nama || 'Pengguna',
+      lahanId: Number(formLahan),
+      lokasi: lahan ? lahan.lokasi.split(',')[0] : '',
+      jenis: formJenis,
+      deskripsi: formDeskripsi,
+      tanggal: formTanggal,
+      foto: formFoto ? formFoto.name : null,
+    };
+    setKegiatan((prev) => [newItem, ...prev]);
+    setShowModal(false);
+    setFormTanggal('');
+    setFormJenis('');
+    setFormLahan('');
+    setFormDeskripsi('');
+    setFormFoto(null);
+  };
+
+  /* ══════════════ RENDER ══════════════ */
+  return (
+    <>
+      <style>{`
+
+        /* modal */
+        .kegiatan-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; z-index: 1000; animation: kegiatan-fadein .2s ease; }
+        .kegiatan-modal { background: #fff; border-radius: 12px; width: 90%; max-width: 520px; box-shadow: 0 20px 60px rgba(0,0,0,.2); animation: kegiatan-slideup .25s ease; max-height: 90vh; overflow-y: auto; }
+        .kegiatan-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; background: #fff; border-radius: 12px 12px 0 0; z-index: 1; }
+        .kegiatan-modal-header h3 { margin: 0; font-size: 17px; color: #1a202c; }
+        .kegiatan-modal-close { background: none; border: none; cursor: pointer; color: #a0aec0; padding: 4px; border-radius: 6px; }
+        .kegiatan-modal-close:hover { color: #1a202c; background: #f0f4f8; }
+        .kegiatan-modal-body { padding: 24px; }
+        .kegiatan-form-group { margin-bottom: 18px; }
+        .kegiatan-form-group label { display: block; font-size: 14px; font-weight: 600; color: #1a202c; margin-bottom: 6px; }
+        .kegiatan-form-group select,
+        .kegiatan-form-group input,
+        .kegiatan-form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; color: #1a202c; background: #fff; box-sizing: border-box; transition: border .2s; }
+        .kegiatan-form-group select:focus,
+        .kegiatan-form-group input:focus,
+        .kegiatan-form-group textarea:focus { outline: none; border-color: #1a365d; box-shadow: 0 0 0 3px rgba(26,54,93,.1); }
+        .kegiatan-form-group textarea { min-height: 80px; resize: vertical; }
+        .kegiatan-form-dropzone { border: 2px dashed #cbd5e0; border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all .2s; background: #f7fafc; }
+        .kegiatan-form-dropzone:hover { border-color: #1a365d; background: #ebf4ff; }
+        .kegiatan-form-dropzone p { margin: 6px 0 0; font-size: 13px; color: #4a5568; }
+        .kegiatan-form-dropzone .file-name { margin-top: 8px; font-size: 13px; font-weight: 600; color: #059669; }
+        .kegiatan-form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
+        .kegiatan-btn-outline { background: transparent; border: 1px solid #e2e8f0; color: #4a5568; }
+        .kegiatan-btn-outline:hover { border-color: #1a365d; color: #1a365d; }
+        .kegiatan-btn-primary { background: #1a365d; color: #fff; }
+        .kegiatan-btn-primary:hover { background: #2d4a7a; }
+
+        @keyframes kegiatan-fadein { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes kegiatan-slideup { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+      `}</style>
+
+      <div className="admin-card animate-fade-in-up">
+        {/* Header Row Inside Card */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #dee2e6' }}>
+          <div>
+            <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#333', margin: 0 }}>Riwayat Kegiatan Petani</h1>
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem', marginTop: '2px', margin: 0 }}>Catatan aktivitas pertanian harian</p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {canAdd && (
+              <button 
+                onClick={() => setShowModal(true)}
+                className="filter-btn filter-btn-primary"
+              >
+                <Plus size={16} /> Tambah Kegiatan
+              </button>
+            )}
+            <nav style={{ marginBottom: 0, fontSize: '0.85rem', display: 'flex', alignItems: 'center', color: 'var(--color-primary)' }}>
+              <span style={{ margin: '0 8px' }}>/</span>
+              <span style={{ fontWeight: '500' }}>kegiatan</span>
+            </nav>
+          </div>
+        </div>
+
+        <div style={{ padding: '20px' }}>
+          {/* Filters */}
+          <div className="filter-row" style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+            <div style={{ fontWeight: '700', fontSize: '0.9rem', color: '#333' }}>Filter</div>
+            
+            <div style={{ flex: 1, minWidth: '200px', display: 'flex', alignItems: 'center', background: 'white', border: '1px solid #ced4da', borderRadius: '8px', padding: '0 12px', height: '38px', boxSizing: 'border-box' }}>
+              <Search size={16} color="#a0aec0" />
+              <input 
+                type="text" 
+                placeholder="Cari kegiatan..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ padding: '8px 8px', border: 'none', outline: 'none', width: '100%', fontSize: '0.9rem', background: 'transparent' }}
+              />
+            </div>
+
+            <div>
+              <input
+                type="date"
+                value={filterDateFrom}
+                onChange={(e) => setFilterDateFrom(e.target.value)}
+                className="filter-input"
+                title="Dari tanggal"
+              />
+            </div>
+            <span style={{ color: '#a0aec0' }}>-</span>
+            <div>
+              <input
+                type="date"
+                value={filterDateTo}
+                onChange={(e) => setFilterDateTo(e.target.value)}
+                className="filter-input"
+                title="Sampai tanggal"
+              />
+            </div>
+
+            <div style={{ width: '180px' }}>
+              <select 
+                value={filterJenis} 
+                onChange={(e) => setFilterJenis(e.target.value)}
+                className="filter-select"
+                style={{ width: '100%' }}
+              >
+                <option value="">Semua Jenis</option>
+                {jenisKegiatan.map((j) => (
+                  <option key={j.value} value={j.value}>{j.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+        <div>
+          <div>
+            {grouped.length === 0 ? (
+              <div className="kegiatan-empty">
+                <Calendar size={48} color="#cbd5e0" />
+                <p>Tidak ada kegiatan ditemukan</p>
+              </div>
+            ) : (
+              grouped.map(([date, items]) => (
+                <div key={date} style={{ marginBottom: '24px' }}>
+                  <div style={{ background: '#f8fafc', padding: '8px 16px', borderRadius: '4px', fontWeight: '700', color: 'var(--color-primary-dark)', display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '12px', border: '1px solid var(--color-border)' }}>
+                    <Calendar size={14} /> {formatTanggal(date)}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {items.map((item) => {
+                      const cfg = getJenisConfig(item.jenis);
+                      return (
+                        <div
+                          key={item.id}
+                          style={{ display: 'flex', gap: '16px', padding: '16px', background: 'white', border: '1px solid var(--color-border-light)', borderRadius: '8px', borderLeft: `4px solid ${cfg.color}` }}
+                        >
+                          <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: `${cfg.color}15`, color: cfg.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            {renderKegiatanIcon(cfg.icon, 20)}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                              <span style={{ padding: '2px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600', background: `${cfg.color}15`, color: cfg.color, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                {renderKegiatanIcon(cfg.icon, 12)} {cfg.label}
+                              </span>
+                              {role !== 'petani' && (
+                                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', fontWeight: '500' }}>oleh <strong style={{ color: 'var(--color-text)' }}>{item.petani}</strong></span>
+                              )}
+                            </div>
+                            <p style={{ margin: '0 0 12px 0', fontSize: '0.9rem', color: 'var(--color-text)', lineHeight: '1.5' }}>{item.deskripsi}</p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <MapPin size={12} /> {item.lokasi}
+                              </span>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <Clock size={12} /> {formatTanggal(item.tanggal)}
+                              </span>
+                            </div>
+                            
+                            {item.foto ? (
+                              <div style={{ marginTop: '12px', display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#f8fafc', border: '1px solid var(--color-border-light)', borderRadius: '4px', fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
+                                <Camera size={14} /> {item.foto}
+                              </div>
+                            ) : (
+                              <div style={{ marginTop: '12px', display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#f8fafc', border: '1px dashed var(--color-border)', borderRadius: '4px', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+                                <Camera size={14} /> Tidak ada foto
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+        </div>
+
+        {/* ── Modal: Tambah Kegiatan ── */}
+        <Modal open={showModal} onClose={() => setShowModal(false)} title="Tambah Kegiatan Baru">
+          <form onSubmit={handleSubmit}>
+            <div className="kegiatan-form-group">
+              <label>Tanggal</label>
+              <input
+                type="date"
+                value={formTanggal}
+                onChange={(e) => setFormTanggal(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="kegiatan-form-group">
+              <label>Jenis Kegiatan</label>
+              <select value={formJenis} onChange={(e) => setFormJenis(e.target.value)} required>
+                <option value="">-- Pilih jenis kegiatan --</option>
+                {jenisKegiatan.map((j) => (
+                  <option key={j.value} value={j.value}>{j.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="kegiatan-form-group">
+              <label>Lahan</label>
+              <select value={formLahan} onChange={(e) => setFormLahan(e.target.value)} required>
+                <option value="">-- Pilih lahan --</option>
+                {userLahan.map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.lokasi} ({l.luas} Ha — {l.jenisLahan})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="kegiatan-form-group">
+              <label>Deskripsi</label>
+              <textarea
+                placeholder="Jelaskan kegiatan yang dilakukan..."
+                value={formDeskripsi}
+                onChange={(e) => setFormDeskripsi(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="kegiatan-form-group">
+              <label>Foto (Opsional)</label>
+              <div
+                className="kegiatan-form-dropzone"
+                onClick={() => document.getElementById('kegiatan-foto-input').click()}
+              >
+                <Camera size={28} color="#a0aec0" />
+                <p>Klik untuk memilih foto</p>
+                <p style={{ fontSize: 11, color: '#a0aec0' }}>JPG, PNG (Maks. 5MB)</p>
+                {formFoto && <p className="file-name">📎 {formFoto.name}</p>}
+              </div>
+              <input
+                id="kegiatan-foto-input"
+                type="file"
+                accept=".jpg,.jpeg,.png"
+                style={{ display: 'none' }}
+                onChange={(e) => { if (e.target.files[0]) setFormFoto(e.target.files[0]); }}
+              />
+            </div>
+
+            <div className="kegiatan-form-actions">
+              <button
+                type="button"
+                className="kegiatan-btn kegiatan-btn-outline"
+                onClick={() => setShowModal(false)}
+              >
+                Batal
+              </button>
+              <button type="submit" className="kegiatan-btn kegiatan-btn-primary">
+                <Plus size={14} /> Simpan Kegiatan
+              </button>
+            </div>
+          </form>
+        </Modal>
+        </div>
+      </div>
+    </>
+  );
+}
