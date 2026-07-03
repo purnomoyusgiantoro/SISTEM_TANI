@@ -28,7 +28,7 @@ Sistem ini terbagi menjadi dua bagian utama:
 
 ## 🚀 Cara Menjalankan Proyek Secara Lokal
 
-Proyek ini menggunakan _monorepo_ sederhana. Frontend berada di *root* direktori, sedangkan backend berada di dalam folder `backend/`. Anda perlu menjalankan dua server terminal secara bersamaan.
+Proyek ini menggunakan _monorepo_ sederhana yang rapi. Frontend berada di folder `frontend/`, sedangkan backend berada di folder `backend/`. Anda perlu menjalankan dua server terminal secara bersamaan.
 
 ### 1. Menjalankan Backend (Laravel API)
 
@@ -64,7 +64,9 @@ Backend API akan dapat diakses di `http://localhost:8000`.
 Buka terminal **baru** (biarkan server backend tetap berjalan), dan jalankan:
 
 ```bash
-# Pastikan Anda berada di root direktori proyek (bukan di dalam folder backend)
+# Masuk ke folder frontend
+cd frontend
+
 # Install dependencies npm
 npm install
 
@@ -107,16 +109,19 @@ RuangTani/
 │   │   └── api.php            # Definisi endpoint (v1)
 │   └── storage/               # Tempat penyimpanan file/gambar
 │
-├── src/                       # 🎨 Frontend React
-│   ├── components/            # Komponen UI Reusable (Navbar, Sidebar)
-│   ├── context/               # React Context (AuthContext)
-│   ├── data/                  # (Legacy) Data mock sebelum ada backend
-│   ├── pages/                 # Halaman utama aplikasi
-│   ├── App.jsx                # Router frontend
-│   └── main.jsx               # Entry point React
+├── frontend/                  # 🎨 Frontend React SPA
+│   ├── src/
+│   │   ├── components/        # Komponen UI Reusable (Navbar, Sidebar)
+│   │   ├── context/           # React Context (AuthContext)
+│   │   ├── data/              # Data statis
+│   │   ├── pages/             # Halaman utama aplikasi
+│   │   ├── App.jsx            # Router frontend
+│   │   └── main.jsx           # Entry point React
+│   ├── package.json           # Dependensi NPM Frontend
+│   └── vite.config.js         # Konfigurasi Vite
 │
-├── package.json               # Dependensi NPM Frontend
-├── tailwind.config.js         # Konfigurasi Tailwind CSS
+├── PRD_Backend_RuangTani.md   # Spesifikasi Backend
+├── PRD_Frontend_RuangTani.md  # Spesifikasi Frontend
 └── README.md                  # Dokumentasi proyek (File ini)
 ```
 
