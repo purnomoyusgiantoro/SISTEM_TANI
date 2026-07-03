@@ -17,7 +17,6 @@ class User extends Authenticatable
 
     protected $fillable = [
         'nama',
-        'name',
         'email',
         'password',
         'role',
@@ -25,6 +24,17 @@ class User extends Authenticatable
         'status',
         'last_login_at',
     ];
+
+    // Backward compatibility: Laravel default 'name' field maps to 'nama'
+    public function getNameAttribute(): string
+    {
+        return $this->nama ?? '';
+    }
+
+    public function setNameAttribute(string $value): void
+    {
+        $this->attributes['nama'] = $value;
+    }
 
     protected $hidden = [
         'password',

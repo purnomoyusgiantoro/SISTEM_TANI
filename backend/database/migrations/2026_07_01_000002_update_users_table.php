@@ -9,7 +9,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('nama', 100)->after('id');
             $table->enum('role', ['petani', 'pengurus', 'bpp', 'admin'])->default('petani')->after('password');
             $table->string('avatar', 255)->nullable()->after('role');
             $table->enum('status', ['aktif', 'nonaktif'])->default('aktif')->after('avatar');
@@ -24,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['nama', 'role', 'avatar', 'status', 'last_login_at']);
+            $table->dropColumn(['role', 'avatar', 'status', 'last_login_at']);
             $table->dropSoftDeletes();
         });
     }

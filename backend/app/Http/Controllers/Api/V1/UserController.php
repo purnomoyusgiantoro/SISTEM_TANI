@@ -45,8 +45,6 @@ class UserController extends Controller
             'status' => 'sometimes|in:aktif,nonaktif',
         ]);
 
-        $validated['name'] = $validated['nama']; // Laravel default field
-
         $user = User::create($validated);
 
         LogAktivitas::create([
@@ -76,10 +74,6 @@ class UserController extends Controller
             'role' => 'sometimes|in:petani,pengurus,bpp,admin',
             'status' => 'sometimes|in:aktif,nonaktif',
         ]);
-
-        if (isset($validated['nama'])) {
-            $validated['name'] = $validated['nama'];
-        }
 
         $user->update($validated);
 

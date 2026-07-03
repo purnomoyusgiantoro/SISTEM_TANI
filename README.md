@@ -1,6 +1,6 @@
-# 🌱 SIMANTAN - Sistem Manajemen Tani
+# 🌱 RuangTani — Sistem Manajemen Kelompok Tani
 
-SIMANTAN adalah sistem informasi kelompok tani berbasis web yang mengelola data lahan pertanian, sewa peralatan, tagihan pembayaran, kegiatan petani, dan berita penyuluhan.
+RuangTani adalah sistem informasi kelompok tani berbasis web yang mengelola data lahan pertanian, sewa peralatan, tagihan pembayaran, kegiatan petani, dan berita penyuluhan.
 
 Sistem ini terbagi menjadi dua bagian utama:
 1. **Frontend**: Aplikasi Single Page (SPA) dibangun menggunakan React, Vite, dan Tailwind CSS.
@@ -83,18 +83,18 @@ Database backend telah diisi (*seeded*) dengan data awal, termasuk akun-akun unt
 
 | Peran (Role) | Email | Nama Pengguna | Deskripsi Hak Akses |
 |---|---|---|---|
-| **Petani** | `budi@simantan.id` | Budi Santoso | Dapat mengelola lahannya sendiri, mengajukan sewa alat, mencatat kegiatan, dan melihat tagihan. |
-| **Petani** | `joko@simantan.id` | Joko Widodo | Sama seperti di atas. |
-| **Pengurus** | `ahmad@simantan.id` | Ahmad Hidayat | Dapat mengelola inventaris peralatan, memvalidasi permohonan sewa, dan memverifikasi bukti pembayaran. |
-| **BPP** | `hendra@simantan.id` | Ir. Hendra Wijaya | (Balai Penyuluhan Pertanian) Memverifikasi pendaftaran lahan baru dan mempublikasikan berita/penyuluhan. |
-| **Admin** | `admin@simantan.id` | Superadmin | Dapat menambah/menonaktifkan akun pengguna dan melihat Log Sistem. |
+| **Petani** | `budi@ruangtani.id` | Budi Santoso | Dapat mengelola lahannya sendiri, mengajukan sewa alat, mencatat kegiatan, dan melihat tagihan. |
+| **Petani** | `joko@ruangtani.id` | Joko Widodo | Sama seperti di atas. |
+| **Pengurus** | `ahmad@ruangtani.id` | Ahmad Hidayat | Dapat mengelola inventaris peralatan, memvalidasi permohonan sewa, dan memverifikasi bukti pembayaran. |
+| **BPP** | `hendra@ruangtani.id` | Ir. Hendra Wijaya | (Balai Penyuluhan Pertanian) Memverifikasi pendaftaran lahan baru dan mempublikasikan berita/penyuluhan. |
+| **Admin** | `admin@ruangtani.id` | Superadmin | Dapat menambah/menonaktifkan akun pengguna, melihat Log Sistem, dan mengelola backup database. |
 
 ---
 
 ## 📁 Struktur Direktori Utama
 
 ```
-serene-borg/
+RuangTani/
 ├── backend/                   # 🚀 Backend Laravel API
 │   ├── app/
 │   │   ├── Http/Controllers/  # Logika bisnis API
@@ -129,6 +129,8 @@ serene-borg/
    - Pengurus menyetujui -> sistem otomatis memotong ketersediaan stok & membuat Tagihan.
 4. **Pembayaran & Verifikasi**: Petani mengunggah bukti transfer, kemudian divalidasi oleh pengurus.
 5. **Jurnal Kegiatan Tani**: Pencatatan riwayat tanam, pupuk, panen, dll.
+6. **Backup & Restore Database**: Admin dapat mengelola backup dan restore database.
 
 ---
-_Dokumen PRD Backend terpisah disimpan di file `PRD_Backend_Laravel_SIMANTAN.md`_
+_Dokumen PRD Backend terpisah disimpan di file `PRD_Backend_RuangTani.md`_
+_Dokumen PRD Frontend terpisah disimpan di file `PRD_Frontend_RuangTani.md`_

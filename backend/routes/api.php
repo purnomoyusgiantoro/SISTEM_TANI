@@ -15,10 +15,11 @@ use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\NotifikasiController;
 use App\Http\Controllers\Api\V1\LogAktivitasController;
 use App\Http\Controllers\Api\V1\MasterDataController;
+use App\Http\Controllers\Api\V1\BackupController;
 
 /*
 |--------------------------------------------------------------------------
-| SIMANTAN API Routes v1
+| RuangTani API Routes v1
 |--------------------------------------------------------------------------
 */
 
@@ -122,5 +123,13 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         Route::delete('users/{id}', [UserController::class, 'destroy']);
         Route::get('log-aktivitas', [LogAktivitasController::class, 'index']);
         Route::get('log-aktivitas/export', [LogAktivitasController::class, 'export']);
+
+        // Backup
+        Route::get('backups', [BackupController::class, 'index']);
+        Route::post('backups', [BackupController::class, 'store']);
+        Route::post('backups/{id}/restore', [BackupController::class, 'restore']);
+        Route::delete('backups/{id}', [BackupController::class, 'destroy']);
+        Route::get('backups/schedule', [BackupController::class, 'schedule']);
+        Route::put('backups/schedule', [BackupController::class, 'updateSchedule']);
     });
 });

@@ -1,12 +1,12 @@
-# 📋 PRD — Backend & Database SIMANTAN
+# 📋 PRD — Backend & Database RuangTani
 ## Sistem Manajemen Lahan & Sewa Peralatan Pertanian
-### Portal Pertanian Pemerintah Kota — Sistem Tani
+### Portal Pertanian — RuangTani
 
 ---
 
 | Informasi | Detail |
 |---|---|
-| **Nama Proyek** | SIMANTAN (Sistem Manajemen Tani) |
+| **Nama Proyek** | RuangTani (Sistem Manajemen Tani) |
 | **Versi Dokumen** | 1.0 |
 | **Tanggal** | 1 Juli 2026 |
 | **Teknologi Backend** | Laravel 11 (PHP 8.2+) |
@@ -18,7 +18,7 @@
 
 ## 1. Ringkasan Proyek
 
-SIMANTAN adalah sistem informasi kelompok tani berbasis web yang mengelola **data lahan pertanian**, **sewa peralatan**, **pembayaran**, **kegiatan petani**, dan **berita/penyuluhan**. Saat ini frontend (React) sudah dibangun lengkap menggunakan **mock data statis**. Dokumen PRD ini mendefinisikan kebutuhan **database** dan **backend API (Laravel)** untuk menggantikan mock data dengan data real yang persisten.
+RuangTani adalah sistem informasi kelompok tani berbasis web yang mengelola **data lahan pertanian**, **sewa peralatan**, **pembayaran**, **kegiatan petani**, dan **berita/penyuluhan**. Saat ini frontend (React) sudah dibangun lengkap menggunakan **mock data statis**. Dokumen PRD ini mendefinisikan kebutuhan **database** dan **backend API (Laravel)** untuk menggantikan mock data dengan data real yang persisten.
 
 ### 1.1. Tujuan
 - Membangun REST API menggunakan Laravel yang melayani seluruh kebutuhan data frontend
@@ -331,7 +331,7 @@ Semua endpoint API menggunakan prefix `/api/v1`. Respons menggunakan format JSON
 **Request `POST /auth/login`:**
 ```json
 {
-  "email": "budi@simantan.id",
+  "email": "budi@ruangtani.id",
   "password": "password123"
 }
 ```
@@ -627,7 +627,7 @@ catatan: "Transfer via BCA"
 ## 4. Struktur Proyek Laravel
 
 ```
-simantan-api/
+ruangtani-api/
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/
@@ -872,14 +872,14 @@ Setiap aksi penting **otomatis dicatat** di tabel `log_aktivitas` via middleware
 ### 8.1. File `.env` yang Perlu Diatur
 
 ```env
-APP_NAME=SIMANTAN
+APP_NAME=RuangTani
 APP_URL=http://localhost:8000
 APP_TIMEZONE=Asia/Jakarta
 
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=simantan_db
+DB_DATABASE=ruangtani_db
 DB_USERNAME=root
 DB_PASSWORD=
 
@@ -904,7 +904,7 @@ FILESYSTEM_DISK=public
 
 ```bash
 # 1. Buat proyek Laravel baru
-composer create-project laravel/laravel simantan-api
+composer create-project laravel/laravel ruangtani-api
 
 # 2. Masuk ke direktori proyek
 cd simantan-api
