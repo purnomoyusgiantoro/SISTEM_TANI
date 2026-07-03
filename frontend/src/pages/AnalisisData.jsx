@@ -164,13 +164,13 @@ export default function AnalisisData() {
           <Map size={18} style={{ color: 'var(--color-accent)' }} /> Rincian Lahan Berdasarkan Wilayah Kecamatan
         </h3>
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem', tableLayout: 'fixed', minWidth: '700px' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)', fontWeight: '700' }}>
                 <th style={{ padding: '12px' }}>Nama Wilayah (Kecamatan)</th>
-                <th style={{ padding: '12px' }}>Jumlah Lahan</th>
-                <th style={{ padding: '12px' }}>Total Luas Wilayah</th>
-                <th style={{ padding: '12px' }}>Kepadatan</th>
+                <th style={{ width: 140, padding: '12px' }}>Jumlah Lahan</th>
+                <th style={{ width: 160, padding: '12px' }}>Total Luas Wilayah</th>
+                <th style={{ width: 180, padding: '12px' }}>Kepadatan</th>
               </tr>
             </thead>
             <tbody>

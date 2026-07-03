@@ -103,43 +103,17 @@ export default function KelolaPengguna() {
         
         <div style={{ padding: '20px' }}>
 
-      {/* Users Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '24px' }}>
-        <div style={{ background: 'white', padding: '16px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
-          <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: '600' }}>TOTAL PENGGUNA</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: '750', color: 'var(--color-primary)', marginTop: '4px' }}>{usersList.length}</div>
-        </div>
-        <div style={{ background: 'white', padding: '16px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
-          <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: '600' }}>ANGGOTA PETANI</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: '750', color: 'var(--color-secondary)', marginTop: '4px' }}>
-            {usersList.filter(u => u.role === 'petani').length}
-          </div>
-        </div>
-        <div style={{ background: 'white', padding: '16px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
-          <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: '600' }}>PENGURUS KELOMPOK</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: '750', color: 'var(--color-info)', marginTop: '4px' }}>
-            {usersList.filter(u => u.role === 'pengurus').length}
-          </div>
-        </div>
-        <div style={{ background: 'white', padding: '16px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
-          <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: '600' }}>PENYULUH BPP</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: '750', color: 'var(--color-accent)', marginTop: '4px' }}>
-            {usersList.filter(u => u.role === 'bpp').length}
-          </div>
-        </div>
-      </div>
-
       {/* Main Table List */}
       <div style={{ background: 'white', borderRadius: '8px', border: '1px solid var(--color-border)', overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '900px', tableLayout: 'fixed' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid var(--color-border)', fontSize: '0.85rem', color: 'var(--color-text-secondary)', fontWeight: '700' }}>
               <th style={{ padding: '12px 16px' }}>Nama Lengkap</th>
               <th style={{ padding: '12px 16px' }}>Email Instansi</th>
-              <th style={{ padding: '12px 16px' }}>Role Akses</th>
-              <th style={{ padding: '12px 16px' }}>Login Terakhir</th>
-              <th style={{ padding: '12px 16px' }}>Status Akun</th>
-              <th style={{ padding: '12px 16px' }}>Aksi</th>
+              <th style={{ width: 140, padding: '12px 16px', textAlign: 'center' }}>Role Akses</th>
+              <th style={{ width: 170, padding: '12px 16px', textAlign: 'center' }}>Login Terakhir</th>
+              <th style={{ width: 140, padding: '12px 16px', textAlign: 'center' }}>Status Akun</th>
+              <th style={{ width: 130, padding: '12px 16px', textAlign: 'center' }}>Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -147,25 +121,30 @@ export default function KelolaPengguna() {
               <tr key={user.id} style={{ borderBottom: '1px solid var(--color-border-light)', fontSize: '0.875rem' }}>
                 <td style={{ padding: '12px 16px', fontWeight: '600' }}>{user.nama}</td>
                 <td style={{ padding: '12px 16px' }}>{user.email}</td>
-                <td style={{ padding: '14px 16px' }}>
+                <td style={{ padding: '14px 16px', textAlign: 'center' }}>
                   <span style={{ 
                     fontSize: '0.75rem', 
                     padding: '2px 8px', 
                     borderRadius: '12px', 
                     fontWeight: '600',
                     textTransform: 'capitalize',
+                    display: 'inline-block',
+                    width: '90px',
+                    textAlign: 'center',
                     background: user.role === 'admin' ? 'var(--color-danger-50)' : user.role === 'bpp' ? 'var(--color-accent-50)' : user.role === 'pengurus' ? 'var(--color-primary-50)' : 'var(--color-secondary-50)',
                     color: user.role === 'admin' ? 'var(--color-danger)' : user.role === 'bpp' ? 'var(--color-accent)' : user.role === 'pengurus' ? 'var(--color-primary)' : 'var(--color-secondary)'
                   }}>
                     {user.role}
                   </span>
                 </td>
-                <td style={{ padding: '14px 16px', color: 'var(--color-text-muted)' }}>{user.lastLogin}</td>
-                <td style={{ padding: '14px 16px' }}>
-                  <StatusBadge status={user.status} />
+                <td style={{ padding: '14px 16px', color: 'var(--color-text-muted)', textAlign: 'center' }}>{user.lastLogin}</td>
+                <td style={{ padding: '14px 16px', textAlign: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <StatusBadge status={user.status} />
+                  </div>
                 </td>
                 <td style={{ padding: '14px 16px' }}>
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                     <button 
                       onClick={() => openEditModal(user)}
                       style={{ padding: '4px', color: 'var(--color-text-secondary)' }}

@@ -298,63 +298,64 @@ export default function Kegiatan() {
 
         <div>
           <div>
-            {grouped.length === 0 ? (
+            {filtered.length === 0 ? (
               <div className="kegiatan-empty">
                 <Calendar size={48} color="#cbd5e0" />
                 <p>Tidak ada kegiatan ditemukan</p>
               </div>
             ) : (
-              grouped.map(([date, items]) => (
-                <div key={date} style={{ marginBottom: '24px' }}>
-                  <div style={{ background: '#f8fafc', padding: '8px 16px', borderRadius: '4px', fontWeight: '700', color: 'var(--color-primary-dark)', display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '12px', border: '1px solid var(--color-border)' }}>
-                    <Calendar size={14} /> {formatTanggal(date)}
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {items.map((item) => {
-                      const cfg = getJenisConfig(item.jenis);
-                      return (
-                        <div
-                          key={item.id}
-                          style={{ display: 'flex', gap: '16px', padding: '16px', background: 'white', border: '1px solid var(--color-border-light)', borderRadius: '8px', borderLeft: `4px solid ${cfg.color}` }}
-                        >
-                          <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: `${cfg.color}15`, color: cfg.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            {renderKegiatanIcon(cfg.icon, 20)}
-                          </div>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                              <span style={{ padding: '2px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600', background: `${cfg.color}15`, color: cfg.color, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                {renderKegiatanIcon(cfg.icon, 12)} {cfg.label}
-                              </span>
-                              {role !== 'petani' && (
-                                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', fontWeight: '500' }}>oleh <strong style={{ color: 'var(--color-text)' }}>{item.petani}</strong></span>
-                              )}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+                {filtered.map((item) => {
+                  const cfg = getJenisConfig(item.jenis);
+                  return (
+                    <div
+                      key={item.id}
+                      style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px', background: 'white', border: '1px solid var(--color-border-light)', borderRadius: '12px', borderTop: `4px solid ${cfg.color}`, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}
+                    >
+                      {/* Card Header: Title */}
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                        <div style={{ flex: 1 }}>
+                          <span style={{ padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '700', background: `${cfg.color}15`, color: cfg.color, display: 'inline-block', marginBottom: '6px' }}>
+                            {cfg.label}
+                          </span>
+                          {role !== 'petani' && (
+                            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
+                              oleh <strong style={{ color: 'var(--color-text)' }}>{item.petani}</strong>
                             </div>
-                            <p style={{ margin: '0 0 12px 0', fontSize: '0.9rem', color: 'var(--color-text)', lineHeight: '1.5' }}>{item.deskripsi}</p>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-                              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <MapPin size={12} /> {item.lokasi}
-                              </span>
-                              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <Clock size={12} /> {formatTanggal(item.tanggal)}
-                              </span>
-                            </div>
-                            
-                            {item.foto ? (
-                              <div style={{ marginTop: '12px', display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#f8fafc', border: '1px solid var(--color-border-light)', borderRadius: '4px', fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
-                                <Camera size={14} /> {item.foto}
-                              </div>
-                            ) : (
-                              <div style={{ marginTop: '12px', display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#f8fafc', border: '1px dashed var(--color-border)', borderRadius: '4px', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-                                <Camera size={14} /> Tidak ada foto
-                              </div>
-                            )}
-                          </div>
+                          )}
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))
+                      </div>
+
+                      {/* Card Body: Description */}
+                      <div style={{ flex: 1 }}>
+                        <p style={{ margin: '8px 0', fontSize: '0.9rem', color: 'var(--color-text)', lineHeight: '1.5' }}>
+                          {item.deskripsi}
+                        </p>
+                      </div>
+
+                      {/* Card Footer: Meta Info */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '12px', borderTop: '1px solid var(--color-border-light)', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <MapPin size={14} color="var(--color-primary)" /> {item.lokasi}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Clock size={14} color="var(--color-primary)" /> {formatTanggal(item.tanggal)}
+                        </div>
+                        
+                        {item.foto ? (
+                          <div style={{ marginTop: '4px', display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#f8fafc', border: '1px solid var(--color-border-light)', borderRadius: '6px', fontSize: '0.75rem', color: 'var(--color-primary-dark)', fontWeight: '600', alignSelf: 'flex-start' }}>
+                            <Camera size={14} /> {item.foto}
+                          </div>
+                        ) : (
+                          <div style={{ marginTop: '4px', display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#f8fafc', border: '1px dashed var(--color-border)', borderRadius: '6px', fontSize: '0.75rem', color: 'var(--color-text-muted)', alignSelf: 'flex-start' }}>
+                            <Camera size={14} /> Tanpa Foto
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
 

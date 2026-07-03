@@ -18,9 +18,11 @@ function StatusBadge({ status }) {
   const cfg = statusConfig[status] || statusConfig.belum_bayar;
   return (
     <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 4,
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+      width: 145, // slightly larger to accommodate icon + text comfortably
       padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
       background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}`,
+      whiteSpace: 'nowrap'
     }}>
       {status === 'lunas' && <CheckCircle2 size={13} />}
       {status === 'belum_bayar' && <AlertCircle size={13} />}
@@ -30,7 +32,8 @@ function StatusBadge({ status }) {
   );
 }
 
-function hitungCountdown(jatuhTempo) {
+function hitungCountdown(jatuhTempo, status) {
+  if (status === 'lunas') return { text: 'Sudah lunas', overdue: false };
   const now = new Date();
   const due = new Date(jatuhTempo);
   const diff = Math.ceil((due - now) / (1000 * 60 * 60 * 24));
@@ -181,9 +184,9 @@ export default function Pembayaran() {
 
         /* tabs */
         .pembayaran-tabs { display: flex; gap: 4px; background: #f0f4f8; border-radius: 8px; padding: 4px; margin-bottom: 24px; overflow-x: auto; }
-        .pembayaran-tab { padding: 10px 20px; border-radius: 8px; border: none; background: transparent; color: #4a5568; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all .2s; }
-        .pembayaran-tab:hover { color: #1a365d; }
-        .pembayaran-tab.active { background: #fff; color: #1a365d; font-weight: 600; border: 1px solid var(--color-border); }
+        .pembayaran-tab { padding: 10px 20px; border-radius: 8px; border: 1px solid transparent; background: transparent; color: #64748b; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all .2s; }
+        .pembayaran-tab:hover { color: #1e293b; }
+        .pembayaran-tab.active { background: #fff; color: #1e293b; border-color: var(--color-border); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 
         /* search */
         .pembayaran-search-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
@@ -195,15 +198,16 @@ export default function Pembayaran() {
         .pembayaran-card-list { display: flex; flex-direction: column; gap: 14px; }
         .pembayaran-card { background: #fff; border-radius: 8px; padding: 20px; border: 1px solid var(--color-border); display: flex; flex-wrap: wrap; align-items: center; gap: 16px; transition: transform .15s; }
         .pembayaran-card:hover { transform: translateY(-1px); }
-        .pembayaran-card-main { flex: 1; min-width: 200px; }
-        .pembayaran-card-id { font-size: 13px; font-weight: 600; color: #1a365d; margin: 0 0 4px; font-family: monospace; }
-        .pembayaran-card-equipment { font-size: 16px; font-weight: 600; color: #1a202c; margin: 0 0 4px; }
+        .pembayaran-card-main { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 4px; }
+        .pembayaran-card-id { font-size: 13px; font-weight: 600; color: #64748b; margin: 0; font-family: monospace; }
+        .pembayaran-card-equipment { font-size: 17px; font-weight: 700; color: #1e293b; margin: 0; }
         .pembayaran-card-petani { font-size: 13px; color: #4a5568; margin: 0; }
-        .pembayaran-card-amount { text-align: right; min-width: 160px; }
-        .pembayaran-card-amount-value { font-size: 20px; font-weight: 700; color: #1a365d; margin: 0; }
-        .pembayaran-card-due { font-size: 12px; color: #4a5568; margin: 4px 0 0; }
+        .pembayaran-card-due { font-size: 13px; color: #64748b; margin: 0; display: flex; align-items: center; gap: 6px; }
         .pembayaran-card-due.overdue { color: #dc2626; font-weight: 600; }
-        .pembayaran-card-actions { display: flex; align-items: center; gap: 10px; }
+        .pembayaran-card-right { display: flex; align-items: center; gap: 32px; flex-wrap: wrap; }
+        .pembayaran-card-amount { text-align: right; min-width: 120px; }
+        .pembayaran-card-amount-value { font-size: 20px; font-weight: 700; color: #1e293b; margin: 0; }
+        .pembayaran-card-actions { display: flex; align-items: center; gap: 12px; }
         .pembayaran-btn { padding: 8px 18px; border-radius: 8px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: 6px; }
         .pembayaran-btn-primary { background: #1a365d; color: #fff; }
         .pembayaran-btn-primary:hover { background: #2d4a7a; }
@@ -219,7 +223,7 @@ export default function Pembayaran() {
 
         /* table */
         .pembayaran-table-wrap { overflow-x: auto; background: #fff; border-radius: 8px; border: 1px solid var(--color-border); }
-        .pembayaran-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .pembayaran-table { width: 100%; min-width: 900px; border-collapse: collapse; font-size: 14px; table-layout: fixed; }
         .pembayaran-table th { text-align: left; padding: 14px 16px; background: #f0f4f8; color: #4a5568; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--color-border); white-space: nowrap; }
         .pembayaran-table td { padding: 14px 16px; border-bottom: 1px solid var(--color-border-light); color: #1a202c; }
         .pembayaran-table tr:last-child td { border-bottom: none; }
@@ -290,88 +294,7 @@ export default function Pembayaran() {
           </div>
           
           <div style={{ padding: '20px' }}>
-            {/* Summary Cards */}
-        <div className="pembayaran-summary">
-          {isPetani ? (
-            <>
-              <div className="pembayaran-summary-card">
-                <div className="pembayaran-summary-icon" style={{ background: '#ebf4ff' }}>
-                  <DollarSign size={24} color="#1a365d" />
-                </div>
-                <div className="pembayaran-summary-info">
-                  <p className="pembayaran-summary-label">Total Tagihan</p>
-                  <p className="pembayaran-summary-value">{formatRupiah(totalTagihan)}</p>
-                </div>
-              </div>
-              <div className="pembayaran-summary-card">
-                <div className="pembayaran-summary-icon" style={{ background: '#fee2e2' }}>
-                  <AlertCircle size={24} color="#dc2626" />
-                </div>
-                <div className="pembayaran-summary-info">
-                  <p className="pembayaran-summary-label">Belum Bayar</p>
-                  <p className="pembayaran-summary-value" style={{ color: '#dc2626' }}>{formatRupiah(belumBayar)}</p>
-                </div>
-              </div>
-              <div className="pembayaran-summary-card">
-                <div className="pembayaran-summary-icon" style={{ background: '#fef9c3' }}>
-                  <Clock size={24} color="#d97706" />
-                </div>
-                <div className="pembayaran-summary-info">
-                  <p className="pembayaran-summary-label">Menunggu Verifikasi</p>
-                  <p className="pembayaran-summary-value" style={{ color: '#d97706' }}>{formatRupiah(menungguVerifikasi)}</p>
-                </div>
-              </div>
-              <div className="pembayaran-summary-card">
-                <div className="pembayaran-summary-icon" style={{ background: '#dcfce7' }}>
-                  <CheckCircle2 size={24} color="#059669" />
-                </div>
-                <div className="pembayaran-summary-info">
-                  <p className="pembayaran-summary-label">Lunas</p>
-                  <p className="pembayaran-summary-value" style={{ color: '#059669' }}>{formatRupiah(lunas)}</p>
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="pembayaran-summary-card">
-                <div className="pembayaran-summary-icon" style={{ background: '#ebf4ff' }}>
-                  <TrendingUp size={24} color="#1a365d" />
-                </div>
-                <div className="pembayaran-summary-info">
-                  <p className="pembayaran-summary-label">Total Pendapatan</p>
-                  <p className="pembayaran-summary-value">{formatRupiah(lunas)}</p>
-                </div>
-              </div>
-              <div className="pembayaran-summary-card">
-                <div className="pembayaran-summary-icon" style={{ background: '#dcfce7' }}>
-                  <DollarSign size={24} color="#059669" />
-                </div>
-                <div className="pembayaran-summary-info">
-                  <p className="pembayaran-summary-label">Pembayaran Masuk Hari Ini</p>
-                  <p className="pembayaran-summary-value" style={{ color: '#059669' }}>{formatRupiah(pembayaranMasukHariIni)}</p>
-                </div>
-              </div>
-              <div className="pembayaran-summary-card">
-                <div className="pembayaran-summary-icon" style={{ background: '#fef9c3' }}>
-                  <Clock size={24} color="#d97706" />
-                </div>
-                <div className="pembayaran-summary-info">
-                  <p className="pembayaran-summary-label">Menunggu Verifikasi</p>
-                  <p className="pembayaran-summary-value" style={{ color: '#d97706' }}>{formatRupiah(menungguVerifikasi)}</p>
-                </div>
-              </div>
-              <div className="pembayaran-summary-card">
-                <div className="pembayaran-summary-icon" style={{ background: '#fee2e2' }}>
-                  <BadgeAlert size={24} color="#dc2626" />
-                </div>
-                <div className="pembayaran-summary-info">
-                  <p className="pembayaran-summary-label">Tagihan Tertunggak</p>
-                  <p className="pembayaran-summary-value" style={{ color: '#dc2626' }}>{formatRupiah(tagihanTertunggak)}</p>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
+
 
         {/* Tabs */}
         <div className="pembayaran-tabs">
@@ -401,46 +324,72 @@ export default function Pembayaran() {
               </div>
             </div>
 
-            <div className="pembayaran-card-list">
-              {filtered.length === 0 ? (
-                <div className="pembayaran-empty">
-                  <FileText size={48} color="#cbd5e0" />
-                  <p>Tidak ada tagihan ditemukan</p>
-                </div>
-              ) : (
-                filtered.map((t) => {
-                  const cd = hitungCountdown(t.jatuhTempo);
-                  return (
-                    <div key={t.id} className="pembayaran-card">
-                      <div className="pembayaran-card-main">
-                        <p className="pembayaran-card-id">{t.id}</p>
-                        <p className="pembayaran-card-equipment">{t.peralatan}</p>
-                        {!isPetani && <p className="pembayaran-card-petani">Petani: {t.petani}</p>}
-                      </div>
-                      <div className="pembayaran-card-amount">
-                        <p className="pembayaran-card-amount-value">{formatRupiah(t.jumlah)}</p>
-                        <p className={`pembayaran-card-due${cd.overdue ? ' overdue' : ''}`}>
-                          <CalendarDays size={12} style={{ verticalAlign: -2, marginRight: 4 }} />
-                          Jatuh tempo: {formatTanggal(t.jatuhTempo)} — {cd.text}
-                        </p>
-                      </div>
-                      <div className="pembayaran-card-actions">
-                        <StatusBadge status={t.status} />
-                        {isPetani && t.status === 'belum_bayar' && (
-                          <button className="pembayaran-btn pembayaran-btn-primary" onClick={() => handleBayar(t.id)}>
-                            <Upload size={14} /> Bayar
-                          </button>
-                        )}
-                        {isPengurus && t.status === 'menunggu_verifikasi' && (
-                          <button className="pembayaran-btn pembayaran-btn-success" onClick={() => { setVerifikasiModal(t); setVerifikasiAction('approve'); }}>
-                            <Check size={14} /> Verifikasi
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })
-              )}
+            <div className="pembayaran-table-wrap">
+              <table className="pembayaran-table">
+                <thead>
+                  <tr>
+                    <th style={{ width: 130 }}>ID Tagihan</th>
+                    <th>Peralatan</th>
+                    {!isPetani && <th>Petani</th>}
+                    <th>Jumlah</th>
+                    <th style={{ width: 120 }}>Jatuh Tempo</th>
+                    <th style={{ width: 180 }}>Status</th>
+                    <th style={{ width: 120 }}>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.length === 0 ? (
+                    <tr>
+                      <td colSpan={isPetani ? 6 : 7} style={{ textAlign: 'center', padding: 40, color: '#a0aec0' }}>
+                        Tidak ada tagihan ditemukan
+                      </td>
+                    </tr>
+                  ) : (
+                    filtered.map((t) => {
+                      const cd = hitungCountdown(t.jatuhTempo, t.status);
+                      return (
+                        <tr key={t.id}>
+                          <td style={{ fontFamily: 'monospace', fontWeight: 600, color: '#1a365d' }}>{t.id}</td>
+                          <td style={{ fontWeight: 600 }}>{t.peralatan}</td>
+                          {!isPetani && <td>{t.petani}</td>}
+                          <td style={{ fontWeight: 700 }}>{formatRupiah(t.jumlah)}</td>
+                          <td>
+                            <div className={`pembayaran-card-due${cd.overdue ? ' overdue' : ''}`}>
+                              {t.status === 'lunas' ? (
+                                'Lunas: ' + formatTanggal(t.tanggalBayar)
+                              ) : (
+                                <div>
+                                  {formatTanggal(t.jatuhTempo)}
+                                  <div style={{ fontSize: '11px', marginTop: '2px', opacity: 0.8 }}>{cd.text}</div>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                          <td><StatusBadge status={t.status} /></td>
+                          <td>
+                            {isPetani && t.status === 'belum_bayar' && (
+                              <button className="pembayaran-btn pembayaran-btn-primary" onClick={() => handleBayar(t.id)}>
+                                <Upload size={14} /> Bayar
+                              </button>
+                            )}
+                            {isPengurus && t.status === 'menunggu_verifikasi' && (
+                              <button className="pembayaran-btn pembayaran-btn-success" onClick={() => { setVerifikasiModal(t); setVerifikasiAction('approve'); }}>
+                                <Check size={14} /> Verifikasi
+                              </button>
+                            )}
+                            {!isPetani && t.status !== 'menunggu_verifikasi' && (
+                              <span style={{ color: '#a0aec0', fontSize: '12px' }}>-</span>
+                            )}
+                            {isPetani && t.status !== 'belum_bayar' && (
+                              <span style={{ color: '#a0aec0', fontSize: '12px' }}>-</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
             </div>
           </>
         )}
@@ -451,14 +400,14 @@ export default function Pembayaran() {
             <table className="pembayaran-table">
               <thead>
                 <tr>
-                  <th>ID Tagihan</th>
+                  <th style={{ width: 130 }}>ID Tagihan</th>
                   <th>Peralatan</th>
                   {!isPetani && <th>Petani</th>}
-                  <th>Jumlah</th>
-                  <th>Tgl Tagihan</th>
-                  <th>Jatuh Tempo</th>
-                  <th>Tgl Bayar</th>
-                  <th>Status</th>
+                  <th style={{ width: 120 }}>Jumlah</th>
+                  <th style={{ width: 120 }}>Tgl Tagihan</th>
+                  <th style={{ width: 120 }}>Jatuh Tempo</th>
+                  <th style={{ width: 120 }}>Tgl Bayar</th>
+                  <th style={{ width: 180 }}>Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -596,33 +545,53 @@ export default function Pembayaran() {
                 <p>Tidak ada pembayaran yang menunggu verifikasi</p>
               </div>
             ) : (
-              myTagihan
-                .filter((t) => t.status === 'menunggu_verifikasi')
-                .map((t) => (
-                  <div key={t.id} className="pembayaran-verif-card">
-                    <div className="pembayaran-verif-info">
-                      <h4>{t.petani} — {t.id}</h4>
-                      <p>Peralatan: {t.peralatan}</p>
-                      <p>Jumlah: <strong>{formatRupiah(t.jumlah)}</strong></p>
-                      <p>Tanggal Upload: {formatTanggal(t.tanggalBayar)}</p>
-                      <p>File: 📎 {t.buktiPembayaran || '-'}</p>
-                    </div>
-                    <div className="pembayaran-card-actions">
-                      <button
-                        className="pembayaran-btn pembayaran-btn-success"
-                        onClick={() => { setVerifikasiModal(t); setVerifikasiAction('approve'); }}
-                      >
-                        <Check size={14} /> Setujui
-                      </button>
-                      <button
-                        className="pembayaran-btn pembayaran-btn-danger"
-                        onClick={() => { setVerifikasiModal(t); setVerifikasiAction('reject'); }}
-                      >
-                        <X size={14} /> Tolak
-                      </button>
-                    </div>
-                  </div>
-                ))
+              <div className="pembayaran-table-wrap">
+                <table className="pembayaran-table">
+                  <thead>
+                    <tr>
+                      <th style={{ width: 150 }}>Petani</th>
+                      <th style={{ width: 130 }}>ID Tagihan</th>
+                      <th>Peralatan</th>
+                      <th style={{ width: 140 }}>Jumlah</th>
+                      <th style={{ width: 150 }}>Tanggal Upload</th>
+                      <th>File Bukti</th>
+                      <th style={{ width: 160 }}>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {myTagihan
+                      .filter((t) => t.status === 'menunggu_verifikasi')
+                      .map((t) => (
+                        <tr key={t.id}>
+                          <td style={{ fontWeight: 600 }}>{t.petani}</td>
+                          <td style={{ fontFamily: 'monospace', color: '#1a365d' }}>{t.id}</td>
+                          <td>{t.peralatan}</td>
+                          <td style={{ fontWeight: 600 }}>{formatRupiah(t.jumlah)}</td>
+                          <td>{formatTanggal(t.tanggalBayar)}</td>
+                          <td>{t.buktiPembayaran || '-'}</td>
+                          <td>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button
+                                className="pembayaran-btn pembayaran-btn-success"
+                                style={{ padding: '6px 12px', fontSize: '12px' }}
+                                onClick={() => { setVerifikasiModal(t); setVerifikasiAction('approve'); }}
+                              >
+                                Setujui
+                              </button>
+                              <button
+                                className="pembayaran-btn pembayaran-btn-danger"
+                                style={{ padding: '6px 12px', fontSize: '12px' }}
+                                onClick={() => { setVerifikasiModal(t); setVerifikasiAction('reject'); }}
+                              >
+                                Tolak
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </>
         )}

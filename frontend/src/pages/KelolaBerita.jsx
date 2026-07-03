@@ -72,6 +72,60 @@ export default function KelolaBerita() {
 
   return (
     <div style={{ animation: 'fadeIn 0.3s ease' }}>
+      <style>{`
+        .kelola-berita-table-wrapper {
+          overflow-x: auto;
+          background: #fff;
+          border-radius: 8px;
+          border: 1px solid var(--color-border);
+        }
+        .kelola-berita-table {
+          width: 100%;
+          min-width: 900px;
+          border-collapse: collapse;
+          font-size: 14px;
+          table-layout: fixed;
+        }
+        .kelola-berita-table th {
+          text-align: left;
+          padding: 14px 16px;
+          background: #f0f4f8;
+          color: #4a5568;
+          font-weight: 600;
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: .5px;
+          border-bottom: 1px solid var(--color-border);
+          white-space: nowrap;
+        }
+        .kelola-berita-table td {
+          padding: 14px 16px;
+          border-bottom: 1px solid var(--color-border-light);
+          color: #1a202c;
+          vertical-align: top;
+        }
+        .kelola-berita-table tr:last-child td { border-bottom: none; }
+        .kelola-berita-table tr:hover td { background: #f7fafc; }
+        .kelola-berita-action-btn {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+        }
+        .kelola-berita-btn-edit {
+          border: 1px solid var(--color-border);
+          background: #fff;
+        }
+        .kelola-berita-btn-delete {
+          border: 1px solid var(--color-danger);
+          color: var(--color-danger);
+          background: #fff;
+        }
+      `}</style>
       <div className="admin-card">
         {/* Header Row Inside Card */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #dee2e6' }}>
@@ -94,74 +148,63 @@ export default function KelolaBerita() {
         
         <div style={{ padding: '20px' }}>
 
-      {/* Stats Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
-        <div style={{ background: 'white', padding: '16px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
-          <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>Total Informasi</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-primary)' }}>{beritaList.length}</div>
-        </div>
-        <div style={{ background: 'white', padding: '16px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
-          <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>Diterbitkan (Online)</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-success)' }}>
-            {beritaList.filter(b => b.status === 'published').length}
-          </div>
-        </div>
-        <div style={{ background: 'white', padding: '16px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
-          <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>Draf Penulisan</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-warning)' }}>
-            {beritaList.filter(b => b.status === 'draft').length}
-          </div>
-        </div>
-      </div>
-
-      {/* Grid of news lists for BPP editor */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        {beritaList.map(berita => (
-          <div 
-            key={berita.id} 
-            style={{ 
-              background: 'white', 
-              border: '1px solid var(--color-border)', 
-              borderRadius: '8px', 
-              padding: '20px', 
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '16px'
-            }}
-          >
-            <div style={{ flex: 1, minWidth: '300px' }}>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{ fontSize: '0.75rem', padding: '2px 8px', background: 'var(--color-primary-50)', color: 'var(--color-primary)', borderRadius: '12px', fontWeight: '600' }}>
-                  {berita.kategori}
-                </span>
-                <StatusBadge status={berita.status} />
-              </div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '6px' }}>{berita.judul}</h3>
-              <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginBottom: '10px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{berita.isi}</p>
-              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                <span>✍️ {berita.penulis}</span>
-                <span style={{ marginLeft: '12px' }}>📅 {formatTanggal(berita.tanggal)}</span>
-              </div>
-            </div>
-            
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button 
-                onClick={() => openEditModal(berita)}
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px', border: '1px solid var(--color-border)', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600' }}
-              >
-                <Edit size={14} /> Edit
-              </button>
-              <button 
-                onClick={() => setShowDeleteModal(berita)}
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px', border: '1px solid var(--color-danger)', color: 'var(--color-danger)', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600' }}
-              >
-                <Trash2 size={14} /> Hapus
-              </button>
-            </div>
-          </div>
-        ))}
+      <div className="kelola-berita-table-wrapper">
+        <table className="kelola-berita-table">
+          <thead>
+            <tr>
+              <th style={{ width: 140 }}>Kategori</th>
+              <th>Judul & Informasi</th>
+              <th style={{ width: 140 }}>Penulis</th>
+              <th style={{ width: 130 }}>Tanggal</th>
+              <th style={{ width: 140 }}>Status</th>
+              <th style={{ width: 160 }}>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {beritaList.length === 0 ? (
+              <tr>
+                <td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#a0aec0' }}>
+                  Belum ada berita/informasi yang dibuat.
+                </td>
+              </tr>
+            ) : (
+              beritaList.map(berita => (
+                <tr key={berita.id}>
+                  <td>
+                    <span style={{ fontSize: '11px', padding: '4px 8px', background: 'var(--color-primary-50)', color: 'var(--color-primary)', borderRadius: '12px', fontWeight: '600', display: 'inline-block', width: '110px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                      {berita.kategori}
+                    </span>
+                  </td>
+                  <td>
+                    <div style={{ fontWeight: '700', marginBottom: '4px', color: '#1e293b' }}>{berita.judul}</div>
+                    <div style={{ fontSize: '12px', color: '#64748b', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {berita.isi}
+                    </div>
+                  </td>
+                  <td>{berita.penulis}</td>
+                  <td>{formatTanggal(berita.tanggal)}</td>
+                  <td><StatusBadge status={berita.status} /></td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button 
+                        onClick={() => openEditModal(berita)}
+                        className="kelola-berita-action-btn kelola-berita-btn-edit"
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        onClick={() => setShowDeleteModal(berita)}
+                        className="kelola-berita-action-btn kelola-berita-btn-delete"
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
 
       {/* Add News Modal */}

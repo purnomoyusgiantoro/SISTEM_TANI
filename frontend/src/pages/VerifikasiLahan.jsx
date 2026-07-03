@@ -104,10 +104,9 @@ const cssText = `
   .verifikasi-tab {
     padding: 10px 20px;
     border-radius: 8px;
-    border: none;
-    cursor: pointer;
     font-size: 14px;
     font-weight: 600;
+    border: 1px solid transparent;
     transition: all 0.2s;
     background: transparent;
     color: #64748b;
@@ -117,8 +116,9 @@ const cssText = `
   }
   .verifikasi-tab.active {
     background: #fff;
-    color: #1a365d;
-    border: 1px solid var(--color-border);
+    color: #1e293b;
+    border-color: var(--color-border);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   }
   .verifikasi-tab:hover:not(.active) {
     color: #1a202c;
@@ -135,11 +135,38 @@ const cssText = `
     background: #1a365d;
     color: #fff;
   }
-  .verifikasi-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-    gap: 16px;
+  .verifikasi-table-wrapper {
+    overflow-x: auto;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
   }
+  .verifikasi-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+    font-size: 14px;
+    table-layout: fixed;
+  }
+  .verifikasi-table th {
+    text-align: left;
+    padding: 14px 16px;
+    background: #f0f4f8;
+    color: #4a5568;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+  }
+  .verifikasi-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--color-border-light);
+    color: #1a202c;
+  }
+  .verifikasi-table tr:last-child td { border-bottom: none; }
+  .verifikasi-table tr:hover td { background: #f7fafc; }
   .verifikasi-card {
     background: #fff;
     border-radius: 8px;
@@ -491,9 +518,9 @@ export default function VerifikasiLahan() {
   };
 
   const tabs = [
-    { key: 'pending', label: 'Pending', icon: <Clock size={16} />, count: counts.pending },
-    { key: 'terverifikasi', label: 'Terverifikasi', icon: <CheckCircle size={16} />, count: counts.terverifikasi },
-    { key: 'ditolak', label: 'Ditolak', icon: <XCircle size={16} />, count: counts.ditolak },
+    { key: 'pending', label: 'Pending', count: counts.pending },
+    { key: 'terverifikasi', label: 'Terverifikasi', count: counts.terverifikasi },
+    { key: 'ditolak', label: 'Ditolak', count: counts.ditolak },
   ];
 
   return (
@@ -514,29 +541,7 @@ export default function VerifikasiLahan() {
           
           <div style={{ padding: '20px' }}>
 
-        <div className="verifikasi-stats">
-          <div className="verifikasi-stat-card">
-            <div className="verifikasi-stat-icon pending"><Clock size={24} /></div>
-            <div className="verifikasi-stat-info">
-              <h3>{counts.pending}</h3>
-              <p>Pending Verifikasi</p>
-            </div>
-          </div>
-          <div className="verifikasi-stat-card">
-            <div className="verifikasi-stat-icon verified"><CheckCircle size={24} /></div>
-            <div className="verifikasi-stat-info">
-              <h3>{counts.terverifikasi}</h3>
-              <p>Terverifikasi</p>
-            </div>
-          </div>
-          <div className="verifikasi-stat-card">
-            <div className="verifikasi-stat-icon rejected"><XCircle size={24} /></div>
-            <div className="verifikasi-stat-info">
-              <h3>{counts.ditolak}</h3>
-              <p>Ditolak</p>
-            </div>
-          </div>
-        </div>
+
 
         <div className="verifikasi-filters">
           <span className="filter-label"><Filter size={14} /> Filter:</span>
@@ -555,7 +560,7 @@ export default function VerifikasiLahan() {
         <div className="verifikasi-tabs">
           {tabs.map(tab => (
             <button key={tab.key} className={`verifikasi-tab ${activeTab === tab.key ? 'active' : ''}`} onClick={() => setActiveTab(tab.key)}>
-              {tab.icon} {tab.label} <span className="tab-count">{tab.count}</span>
+              {tab.label} <span className="tab-count">{tab.count}</span>
             </button>
           ))}
         </div>
@@ -567,68 +572,62 @@ export default function VerifikasiLahan() {
             <p>Tidak ada lahan {activeTab} yang ditemukan dengan filter ini.</p>
           </div>
         ) : (
-          <div className="verifikasi-cards">
-            {filteredLahan.map(lahan => (
-              <div className="verifikasi-card" key={lahan.id}>
-                <div className="verifikasi-card-header">
-                  <h4><User size={16} /> {lahan.pemilik}</h4>
-                  <StatusBadge variant={lahan.statusVerifikasi === 'terverifikasi' ? 'success' : lahan.statusVerifikasi === 'ditolak' ? 'danger' : 'warning'}>
-                    {lahan.statusVerifikasi === 'terverifikasi' ? 'Terverifikasi' : lahan.statusVerifikasi === 'ditolak' ? 'Ditolak' : 'Pending'}
-                  </StatusBadge>
-                </div>
-                <div className="verifikasi-card-meta">
-                  <div className="verifikasi-meta-item">
-                    <MapPin size={14} className="meta-icon" />
-                    <div><div className="meta-label">Lokasi</div><div className="meta-value">{lahan.lokasi}</div></div>
-                  </div>
-                  <div className="verifikasi-meta-item">
-                    <Layers size={14} className="meta-icon" />
-                    <div><div className="meta-label">Luas</div><div className="meta-value">{lahan.luas} Ha</div></div>
-                  </div>
-                  <div className="verifikasi-meta-item">
-                    <FileText size={14} className="meta-icon" />
-                    <div><div className="meta-label">Jenis</div><div className="meta-value">{lahan.jenisLahan}</div></div>
-                  </div>
-                  <div className="verifikasi-meta-item">
-                    <Calendar size={14} className="meta-icon" />
-                    <div><div className="meta-label">Tanggal Daftar</div><div className="meta-value">{formatTanggal(lahan.tanggalDaftar)}</div></div>
-                  </div>
-                </div>
-                <div className="verifikasi-card-notes">
-                  <FileText size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 6, color: '#94a3b8' }} />
-                  {lahan.catatan}
-                </div>
-
-                {lahan.statusVerifikasi === 'pending' && (
-                  <div className="verifikasi-card-actions">
-                    <button className="verifikasi-btn verifikasi-btn-approve" onClick={() => openModal(lahan)}>
-                      <CheckCircle size={15} /> Verifikasi
-                    </button>
-                    <button className="verifikasi-btn verifikasi-btn-reject" onClick={() => { setSelectedLahan(lahan); setKeputusan('tolak'); setCatatanVerifikasi(''); setAlasanPenolakan(''); setModalOpen(true); }}>
-                      <X size={15} /> Tolak
-                    </button>
-                  </div>
-                )}
-
-                {lahan.statusVerifikasi === 'terverifikasi' && (
-                  <div className="verifikasi-verified-info">
-                    <CheckCircle size={18} className="check-icon" />
-                    <div className="info-text">
-                      Diverifikasi oleh <strong>{lahan.verifikator}</strong>
-                    </div>
-                  </div>
-                )}
-
-                {lahan.statusVerifikasi === 'ditolak' && (
-                  <div className="verifikasi-rejected-info">
-                    <XCircle size={18} className="x-icon" />
-                    <div className="info-text">
-                      Alasan: {lahan.catatan}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
+          <div className="verifikasi-table-wrapper">
+            <table className="verifikasi-table">
+              <thead>
+                <tr>
+                  <th style={{ width: 160 }}>Petani</th>
+                  <th>Lokasi</th>
+                  <th style={{ width: 100 }}>Luas</th>
+                  <th style={{ width: 130 }}>Jenis Lahan</th>
+                  <th style={{ width: 130 }}>Tgl Daftar</th>
+                  <th style={{ width: 180 }}>Status</th>
+                  <th style={{ width: 160 }}>Aksi / Ket</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredLahan.map((lahan) => (
+                  <tr key={lahan.id}>
+                    <td style={{ fontWeight: 600 }}>{lahan.pemilik}</td>
+                    <td>{lahan.lokasi}</td>
+                    <td style={{ fontWeight: 600 }}>{lahan.luas} Ha</td>
+                    <td>{lahan.jenisLahan}</td>
+                    <td>{formatTanggal(lahan.tanggalDaftar)}</td>
+                    <td><StatusBadge status={lahan.statusVerifikasi} /></td>
+                    <td>
+                      {lahan.statusVerifikasi === 'pending' && (
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            className="verifikasi-btn verifikasi-btn-approve"
+                            style={{ padding: '6px 12px', fontSize: '12px', flex: 'none' }}
+                            onClick={() => openModal(lahan)}
+                          >
+                            Verifikasi
+                          </button>
+                          <button
+                            className="verifikasi-btn verifikasi-btn-reject"
+                            style={{ padding: '6px 12px', fontSize: '12px', flex: 'none' }}
+                            onClick={() => { setSelectedLahan(lahan); setKeputusan('tolak'); setCatatanVerifikasi(''); setAlasanPenolakan(''); setModalOpen(true); }}
+                          >
+                            Tolak
+                          </button>
+                        </div>
+                      )}
+                      {lahan.statusVerifikasi === 'terverifikasi' && (
+                        <div style={{ fontSize: '12px', color: '#059669' }}>
+                          {lahan.verifikator}
+                        </div>
+                      )}
+                      {lahan.statusVerifikasi === 'ditolak' && (
+                        <div style={{ fontSize: '12px', color: '#dc2626' }}>
+                          {lahan.catatan}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
 

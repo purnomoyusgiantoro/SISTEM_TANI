@@ -379,7 +379,7 @@ export default function SewaPeralatan() {
           
           {/* Export and Search removed to match new reference image style */}
           
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px', border: '1px solid #dee2e6' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px', border: '1px solid #dee2e6', tableLayout: 'fixed' }}>
             <thead>
               <tr style={{ background: '#f8f9fa', borderBottom: '2px solid #dee2e6', fontSize: '0.85rem', color: '#333', fontWeight: 'bold' }}>
                 <th style={{ padding: '12px' }}>ID Sewa</th>

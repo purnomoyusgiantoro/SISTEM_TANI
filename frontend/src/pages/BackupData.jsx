@@ -91,14 +91,14 @@ export default function BackupData() {
           </div>
 
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem', tableLayout: 'fixed', minWidth: '800px' }}>
               <thead>
                 <tr style={{ borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)', fontWeight: '700' }}>
                   <th style={{ padding: '12px' }}>Nama File Cadangan</th>
-                  <th style={{ padding: '12px' }}>Ukuran</th>
-                  <th style={{ padding: '12px' }}>Tanggal Dibuat</th>
-                  <th style={{ padding: '12px' }}>Tipe</th>
-                  <th style={{ padding: '12px' }}>Aksi</th>
+                  <th style={{ width: 100, padding: '12px' }}>Ukuran</th>
+                  <th style={{ width: 150, padding: '12px' }}>Tanggal Dibuat</th>
+                  <th style={{ width: 100, padding: '12px' }}>Tipe</th>
+                  <th style={{ width: 140, padding: '12px' }}>Aksi</th>
                 </tr>
               </thead>
               <tbody>

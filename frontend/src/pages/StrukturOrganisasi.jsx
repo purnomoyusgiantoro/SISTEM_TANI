@@ -34,9 +34,6 @@ export default function StrukturOrganisasi() {
             cursor: currentUser.role === 'pengurus' ? 'pointer' : 'default'
           }}
         >
-          <div className="org-node-avatar">
-            {node.nama[0]}
-          </div>
           <div className="org-node-details">
             <h4 className="org-node-name">{node.nama}</h4>
             <span className="org-node-title">{node.jabatan}</span>

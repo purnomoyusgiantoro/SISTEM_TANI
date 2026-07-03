@@ -243,7 +243,7 @@ export default function DataLahan() {
 
         {/* Table */}
         <div className="lahan-table-wrapper" style={{ overflowX: 'auto', border: 'none', boxShadow: 'none' }}>
-          <table className="lahan-table" style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #dee2e6' }}>
+          <table className="lahan-table" style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #dee2e6', tableLayout: 'fixed' }}>
             <thead>
               <tr style={{ background: '#f8f9fa', borderBottom: '2px solid #dee2e6' }}>
                 <th style={{ width: 50, padding: '12px', fontWeight: 'bold', color: '#333' }}>No</th>
@@ -251,8 +251,8 @@ export default function DataLahan() {
                 <th style={{ padding: '12px', fontWeight: 'bold', color: '#333' }}>Lokasi</th>
                 <th style={{ width: 90, padding: '12px', fontWeight: 'bold', color: '#333' }}>Luas (Ha)</th>
                 <th style={{ width: 120, padding: '12px', fontWeight: 'bold', color: '#333' }}>Jenis Lahan</th>
-                <th style={{ width: 130, padding: '12px', fontWeight: 'bold', color: '#333' }}>Verifikasi:Status</th>
-                <th style={{ width: 100, padding: '12px', fontWeight: 'bold', color: '#333' }}>Aksi</th>
+                <th style={{ width: 160, padding: '12px', fontWeight: 'bold', color: '#333' }}>Verifikasi:Status</th>
+                <th style={{ width: 120, padding: '12px', fontWeight: 'bold', color: '#333' }}>Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -274,9 +274,6 @@ export default function DataLahan() {
                     </td>
                     <td>
                       <div className="lahan-cell-pemilik">
-                        <div className="lahan-avatar">
-                          {lahan.pemilik.charAt(0)}
-                        </div>
                         <span>{lahan.pemilik}</span>
                       </div>
                     </td>
@@ -293,9 +290,7 @@ export default function DataLahan() {
                       <span className="lahan-jenis-badge">{lahan.jenisLahan}</span>
                     </td>
                     <td>
-                      <StatusBadge variant={getStatusVariant(lahan.statusVerifikasi)}>
-                        {getStatusLabel(lahan.statusVerifikasi)}
-                      </StatusBadge>
+                      <StatusBadge status={lahan.statusVerifikasi} />
                     </td>
                     <td>
                       <div className="lahan-actions">
@@ -498,19 +493,14 @@ export default function DataLahan() {
               {/* Detail Card */}
               <div className="lahan-detail-card">
                 <div className="lahan-detail-header">
-                  <div className="lahan-detail-avatar">
-                    {detailLahan.pemilik.charAt(0)}
-                  </div>
-                  <div>
+                  <div className="lahan-detail-header-info">
                     <h3 className="lahan-detail-name">{detailLahan.pemilik}</h3>
                     <p className="lahan-detail-loc">
                       <MapPin size={13} />
                       {detailLahan.lokasi}
                     </p>
                   </div>
-                  <StatusBadge variant={getStatusVariant(detailLahan.statusVerifikasi)}>
-                    {getStatusLabel(detailLahan.statusVerifikasi)}
-                  </StatusBadge>
+                  <StatusBadge status={detailLahan.statusVerifikasi} />
                 </div>
 
                 <div className="lahan-detail-grid">
@@ -916,11 +906,14 @@ const lahanStyles = `
   .lahan-jenis-badge {
     display: inline-block;
     padding: 3px 10px;
+    min-width: 100px;
+    text-align: center;
     border-radius: 6px;
     background: #f0f4f8;
     color: #475569;
     font-size: 12px;
     font-weight: 500;
+    white-space: nowrap;
   }
 
   /* Action buttons */

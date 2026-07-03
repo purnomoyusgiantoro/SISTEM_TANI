@@ -94,7 +94,7 @@ export default function LogAktivitas() {
       {/* Logs Table Area */}
       <div style={{ background: 'white', borderRadius: '8px', border: '1px solid var(--color-border)', overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px', tableLayout: 'fixed' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid var(--color-border)', fontSize: '0.85rem', color: 'var(--color-text-secondary)', background: 'var(--color-bg)', fontWeight: '700' }}>
                 <th style={{ padding: '12px 16px', width: '60px' }}>Tipe</th>

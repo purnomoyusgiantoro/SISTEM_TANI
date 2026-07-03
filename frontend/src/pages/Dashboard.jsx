@@ -62,13 +62,6 @@ export default function Dashboard() {
 
     return (
       <div className="dashboard-grid animate-fade-in-up">
-        {/* Stats Row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '24px' }}>
-          <StatCard title="Total Lahan" value={stats.totalLahan} icon={MapPin} variant="primary" />
-          <StatCard title="Luas Lahan" value={stats.luasTotal} icon={Maximize2} variant="secondary" />
-          <StatCard title="Sewa Peralatan Aktif" value={stats.sewaAktif} icon={Package} variant="info" />
-          <StatCard title="Tagihan Belum Lunas" value={stats.tagihanBelumBayar} icon={AlertCircle} variant="danger" />
-        </div>
 
         {/* Main Content Layout */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -82,7 +75,7 @@ export default function Dashboard() {
                 </button>
               </div>
               <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid var(--color-border)', textAlign: 'left', fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
                       <th style={{ padding: '12px 16px' }}>Lokasi</th>
@@ -122,7 +115,7 @@ export default function Dashboard() {
                 </button>
               </div>
               <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid var(--color-border)', textAlign: 'left', fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
                       <th style={{ padding: '12px 16px' }}>Peralatan</th>
@@ -163,13 +156,6 @@ export default function Dashboard() {
     
     return (
       <div className="dashboard-grid animate-fade-in-up">
-        {/* Stats Row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '24px' }}>
-          <StatCard title="Total Lahan Terdaftar" value={stats.totalLahan} icon={MapPin} variant="primary" />
-          <StatCard title="Anggota Petani" value={stats.totalPetani} icon={Users} variant="secondary" />
-          <StatCard title="Stok Alat Tersedia" value={stats.peralatanTersedia} icon={Package} variant="info" />
-          <StatCard title="Pendapatan Kas Sewa" value={formatRupiah(stats.totalPendapatan)} icon={TrendingUp} variant="success" />
-        </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <div style={{ width: '100%' }}>
@@ -182,14 +168,14 @@ export default function Dashboard() {
                 </button>
               </div>
               <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid var(--color-border)', textAlign: 'left', fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
-                      <th style={{ padding: '12px 16px' }}>Petani</th>
+                      <th style={{ width: 140, padding: '12px 16px' }}>Petani</th>
                       <th style={{ padding: '12px 16px' }}>Peralatan</th>
-                      <th style={{ padding: '12px 16px' }}>Durasi</th>
-                      <th style={{ padding: '12px 16px' }}>Biaya</th>
-                      <th style={{ padding: '12px 16px' }}>Aksi</th>
+                      <th style={{ width: 100, padding: '12px 16px' }}>Durasi</th>
+                      <th style={{ width: 130, padding: '12px 16px' }}>Biaya</th>
+                      <th style={{ width: 100, padding: '12px 16px' }}>Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -261,12 +247,7 @@ export default function Dashboard() {
     
     return (
       <div className="dashboard-grid animate-fade-in-up">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '24px' }}>
-          <StatCard title="Lahan Terverifikasi" value={stats.lahanTerverifikasi} icon={CheckCircle} variant="success" />
-          <StatCard title="Antrean Verifikasi" value={stats.pendingVerifikasi} icon={AlertCircle} variant="warning" />
-          <StatCard title="Lahan Ditolak" value={stats.ditolak} icon={XCircle} variant="danger" />
-          <StatCard title="Publikasi Berita BPP" value={stats.totalBerita} icon={FileText} variant="primary" />
-        </div>
+
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <div style={{ width: '100%' }}>
@@ -279,13 +260,13 @@ export default function Dashboard() {
                 </button>
               </div>
               <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid var(--color-border)', textAlign: 'left', fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
-                      <th style={{ padding: '12px 16px' }}>Petani</th>
+                      <th style={{ width: 150, padding: '12px 16px' }}>Petani</th>
                       <th style={{ padding: '12px 16px' }}>Lokasi Lahan</th>
-                      <th style={{ padding: '12px 16px' }}>Luas</th>
-                      <th style={{ padding: '12px 16px' }}>Aksi</th>
+                      <th style={{ width: 100, padding: '12px 16px' }}>Luas</th>
+                      <th style={{ width: 110, padding: '12px 16px' }}>Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -320,13 +301,6 @@ export default function Dashboard() {
   const renderAdminDashboard = () => {
     return (
       <div className="dashboard-grid animate-fade-in-up">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '24px' }}>
-          <StatCard title="Total Pengguna Terdaftar" value={stats.totalPengguna} icon={Users} variant="primary" />
-          <StatCard title="Pengguna Aktif" value={stats.penggunaAktif} icon={CheckCircle} variant="success" />
-          <StatCard title="Uptime Sistem" value={stats.uptime} icon={Activity} variant="info" />
-          <StatCard title="Backup Terakhir" value={stats.backupTerakhir} icon={HardDrive} variant="warning" />
-        </div>
-
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* Logs */}
           <div style={{ width: '100%' }}>

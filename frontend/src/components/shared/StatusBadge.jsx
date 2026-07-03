@@ -52,7 +52,9 @@ export default function StatusBadge({ status, label, size = 'default' }) {
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: '4px',
+        justifyContent: 'center',
+        width: size === 'small' ? '100px' : '135px',
+        gap: '6px',
         fontSize,
         fontWeight: 600,
         padding,
