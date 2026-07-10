@@ -1,11 +1,14 @@
-import { useState } from 'react';
-import { users as mockUsers } from '../data/mockData';
+import { useState, useEffect } from 'react';
+import * as Mock from '../data/mockData';
+import { useToast } from '../context/ToastContext';
+import usersApi from '../api/users';
+import { useApi, useMutation } from '../hooks/useApi';
 import { Plus, Edit, Trash2, Shield, UserX, UserCheck } from 'lucide-react';
 import StatusBadge from '../components/shared/StatusBadge';
 import Modal from '../components/shared/Modal';
 
 export default function KelolaPengguna() {
-  const [usersList, setUsersList] = useState(mockUsers);
+  const [usersList, setUsersList] = useState(Mock.users);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(null);

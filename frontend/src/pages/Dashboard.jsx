@@ -1,12 +1,9 @@
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { 
-  dashboardStats, 
-  dataLahan, 
-  dataSewa, 
-  dataBerita, 
-  logAktivitas,
-  formatRupiah 
-} from '../data/mockData';
+import dashboardApi from '../api/dashboard';
+import { useApi } from '../hooks/useApi';
+import { formatRupiah } from '../utils/formatters';
+import LoadingSpinner from '../components/shared/LoadingSpinner';
 import StatCard from '../components/shared/StatCard';
 import StatusBadge from '../components/shared/StatusBadge';
 import { 
@@ -33,9 +30,16 @@ import { useNavigate } from 'react-router-dom';
 export default function Dashboard() {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const { data: statsData, loading, error, execute: fetchStats } = useApi(dashboardApi.getStats);
 
   const role = currentUser?.role || 'petani';
-  const stats = dashboardStats[role];
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
+  const stats = statsData || {};
+
 
   // Helper date
   const getGreeting = () => {
@@ -56,9 +60,8 @@ export default function Dashboard() {
   // Render Dashboard based on role
   const renderPetaniDashboard = () => {
     // Land owned by current farmer
-    const myLahan = dataLahan.filter(l => l.pemilikId === currentUser.id);
-    const mySewa = dataSewa.filter(s => s.petaniId === currentUser.id);
-    const recentNews = dataBerita.filter(b => b.status === 'published').slice(0, 2);
+    const myLahan = stats.lahan_terbaru || [];
+    const mySewa = stats.sewa_terbaru || [];
 
     return (
       <div className="dashboard-grid animate-fade-in-up">
@@ -90,9 +93,9 @@ export default function Dashboard() {
                         <tr key={l.id} style={{ borderBottom: '1px solid var(--color-border-light)', fontSize: '0.85rem' }}>
                           <td style={{ padding: '12px 16px' }}>{l.lokasi}</td>
                           <td style={{ padding: '12px 16px' }}>{l.luas} Ha</td>
-                          <td style={{ padding: '12px 16px' }}>{l.jenisLahan}</td>
+                          <td style={{ padding: '12px 16px' }}>{l.jenisLahan || l.jenis_lahan}</td>
                           <td style={{ padding: '12px 16px' }}>
-                            <StatusBadge status={l.statusVerifikasi} />
+                            <StatusBadge status={l.statusVerifikasi || l.status_verifikasi} />
                           </td>
                         </tr>
                       ))
@@ -128,9 +131,9 @@ export default function Dashboard() {
                     {mySewa.length > 0 ? (
                       mySewa.slice(0, 3).map((s) => (
                         <tr key={s.id} style={{ borderBottom: '1px solid var(--color-border-light)', fontSize: '0.85rem' }}>
-                          <td style={{ padding: '12px 16px', fontWeight: '600' }}>{s.peralatan}</td>
-                          <td style={{ padding: '12px 16px' }}>{s.tanggalMulai}</td>
-                          <td style={{ padding: '12px 16px' }}>{formatRupiah(s.totalBiaya)}</td>
+                          <td style={{ padding: '12px 16px', fontWeight: '600' }}>{s.peralatan?.nama || s.peralatan || '-'}</td>
+                          <td style={{ padding: '12px 16px' }}>{s.tanggalMulai || s.tanggal_mulai}</td>
+                          <td style={{ padding: '12px 16px' }}>{formatRupiah(s.totalBiaya || s.total_biaya)}</td>
                           <td style={{ padding: '12px 16px' }}>
                             <StatusBadge status={s.status} />
                           </td>
@@ -152,7 +155,7 @@ export default function Dashboard() {
   };
 
   const renderPengurusDashboard = () => {
-    const pendingSewa = dataSewa.filter(s => s.validasi === 'pending');
+    const pendingSewa = stats.pending_sewa || [];
     
     return (
       <div className="dashboard-grid animate-fade-in-up">
@@ -182,10 +185,10 @@ export default function Dashboard() {
                     {pendingSewa.length > 0 ? (
                       pendingSewa.slice(0, 3).map((s) => (
                         <tr key={s.id} style={{ borderBottom: '1px solid var(--color-border-light)', fontSize: '0.85rem' }}>
-                          <td style={{ padding: '12px 16px' }}>{s.petani}</td>
-                          <td style={{ padding: '12px 16px', fontWeight: '600' }}>{s.peralatan}</td>
-                          <td style={{ padding: '12px 16px' }}>{s.durasi} Hari</td>
-                          <td style={{ padding: '12px 16px' }}>{formatRupiah(s.totalBiaya)}</td>
+                          <td style={{ padding: '12px 16px' }}>{s.petani?.nama || s.petani || '-'}</td>
+                          <td style={{ padding: '12px 16px', fontWeight: '600' }}>{s.peralatan?.nama || s.peralatan || '-'}</td>
+                          <td style={{ padding: '12px 16px' }}>{s.durasi_hari || s.durasi} Hari</td>
+                          <td style={{ padding: '12px 16px' }}>{formatRupiah(s.totalBiaya || s.total_biaya)}</td>
                           <td style={{ padding: '12px 16px' }}>
                             <button onClick={() => navigate('/sewa-peralatan')} style={{ padding: '4px 8px', background: 'var(--color-primary)', color: 'white', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '600' }}>
                               Tinjau
@@ -243,7 +246,7 @@ export default function Dashboard() {
   };
 
   const renderBPPDashboard = () => {
-    const pendingVerifikasi = dataLahan.filter(l => l.statusVerifikasi === 'pending');
+    const pendingVerifikasi = stats.antrean_verifikasi || [];
     
     return (
       <div className="dashboard-grid animate-fade-in-up">
@@ -273,7 +276,7 @@ export default function Dashboard() {
                     {pendingVerifikasi.length > 0 ? (
                       pendingVerifikasi.slice(0, 3).map((l) => (
                         <tr key={l.id} style={{ borderBottom: '1px solid var(--color-border-light)', fontSize: '0.85rem' }}>
-                          <td style={{ padding: '12px 16px' }}>{l.pemilik}</td>
+                          <td style={{ padding: '12px 16px' }}>{l.pemilik?.nama || l.pemilik || '-'}</td>
                           <td style={{ padding: '12px 16px' }}>{l.lokasi}</td>
                           <td style={{ padding: '12px 16px' }}>{l.luas} Ha</td>
                           <td style={{ padding: '12px 16px' }}>
@@ -312,14 +315,16 @@ export default function Dashboard() {
               </button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {logAktivitas.slice(0, 5).map(log => (
+              {(stats.log_terbaru || []).slice(0, 5).map(log => (
                 <div key={log.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-border-light)', paddingBottom: '8px', fontSize: '0.85rem' }}>
                   <div>
-                    <span style={{ fontWeight: '600', color: 'var(--color-text)' }}>{log.user}</span>
+                    <span style={{ fontWeight: '600', color: 'var(--color-text)' }}>{log.user_name || log.user || '-'}</span>
                     <span style={{ color: 'var(--color-text-secondary)', marginLeft: '4px' }}>({log.aksi})</span>
                     <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>{log.detail}</div>
                   </div>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{log.waktu.split(' ')[1]}</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+                    {(log.created_at || log.waktu || '').replace('T', ' ').substring(11, 16) || '-'}
+                  </span>
                 </div>
               ))}
             </div>
@@ -332,6 +337,8 @@ export default function Dashboard() {
 
   return (
     <div style={{ animation: 'fadeIn 0.3s ease' }}>
+      {loading && <LoadingSpinner message="Memuat dashboard..." />}
+      {error && <div style={{ padding: '20px', textAlign: 'center', color: 'var(--color-danger)' }}>Gagal memuat data: {error.message}</div>}
       {/* Welcome Greeting Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
         <div>
@@ -353,10 +360,10 @@ export default function Dashboard() {
       </div>
 
       {/* Conditional Dashboard Rendering */}
-      {role === 'petani' && renderPetaniDashboard()}
-      {role === 'pengurus' && renderPengurusDashboard()}
-      {role === 'bpp' && renderBPPDashboard()}
-      {role === 'admin' && renderAdminDashboard()}
+      {!loading && !error && role === 'petani' && renderPetaniDashboard()}
+      {!loading && !error && role === 'pengurus' && renderPengurusDashboard()}
+      {!loading && !error && role === 'bpp' && renderBPPDashboard()}
+      {!loading && !error && role === 'admin' && renderAdminDashboard()}
 
       <style>{`
         @media (max-width: 900px) {

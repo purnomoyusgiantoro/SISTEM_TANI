@@ -1,8 +1,12 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import {
-  dataKegiatan, jenisKegiatan, dataLahan, formatTanggal,
-} from '../data/mockData';
+import { useToast } from '../context/ToastContext';
+import kegiatanApi from '../api/kegiatan';
+import lahanApi from '../api/lahan';
+import masterApi from '../api/master';
+import { useApi, useMutation } from '../hooks/useApi';
+import { formatTanggal } from '../utils/formatters';
+import * as Mock from '../data/mockData';
 import {
   Plus, Search, Filter, X, Calendar, ChevronLeft, ChevronRight,
   Camera, FileText, Clock, Sprout, Droplet, Wind, Wheat, Hammer, Wrench, MapPin
@@ -10,7 +14,7 @@ import {
 
 /* ── helpers ── */
 function getJenisConfig(value) {
-  return jenisKegiatan.find((j) => j.value === value) || { label: value, icon: 'kegiatan', color: '#6b7280' };
+  return Mock.jenisKegiatan.find((j) => j.value === value) || { label: value, icon: 'kegiatan', color: '#6b7280' };
 }
 
 function renderKegiatanIcon(code, size = 18) {
@@ -122,7 +126,7 @@ export default function Kegiatan() {
   const role = currentUser?.role || 'petani';
   const canAdd = role === 'petani' || role === 'pengurus';
 
-  const [kegiatan, setKegiatan] = useState(dataKegiatan);
+  const [kegiatan, setKegiatan] = useState(Mock.dataKegiatan);
   const [showModal, setShowModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterJenis, setFilterJenis] = useState('');
@@ -157,14 +161,14 @@ export default function Kegiatan() {
 
   /* userLahan */
   const userLahan = useMemo(() => {
-    if (role === 'petani') return dataLahan.filter((l) => l.pemilikId === currentUser?.id);
-    return dataLahan;
+    if (role === 'petani') return Mock.dataLahan.filter((l) => l.pemilikId === currentUser?.id);
+    return Mock.dataLahan;
   }, [role, currentUser]);
 
   /* ── submit ── */
   const handleSubmit = (e) => {
     e.preventDefault();
-    const lahan = dataLahan.find((l) => l.id === Number(formLahan));
+    const lahan = Mock.dataLahan.find((l) => l.id === Number(formLahan));
     const newItem = {
       id: kegiatan.length + 1,
       petaniId: currentUser?.id || 1,
@@ -289,7 +293,7 @@ export default function Kegiatan() {
                 style={{ width: '100%' }}
               >
                 <option value="">Semua Jenis</option>
-                {jenisKegiatan.map((j) => (
+                {Mock.jenisKegiatan.map((j) => (
                   <option key={j.value} value={j.value}>{j.label}</option>
                 ))}
               </select>
@@ -378,7 +382,7 @@ export default function Kegiatan() {
               <label>Jenis Kegiatan</label>
               <select value={formJenis} onChange={(e) => setFormJenis(e.target.value)} required>
                 <option value="">-- Pilih jenis kegiatan --</option>
-                {jenisKegiatan.map((j) => (
+                {Mock.jenisKegiatan.map((j) => (
                   <option key={j.value} value={j.value}>{j.label}</option>
                 ))}
               </select>

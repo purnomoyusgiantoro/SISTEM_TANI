@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { 
-  peralatan as mockPeralatan, 
-  dataSewa as mockDataSewa, 
-  kategoriPeralatan, 
-  formatRupiah, 
-  formatTanggal 
-} from '../data/mockData';
+import { useToast } from '../context/ToastContext';
+import peralatanApi from '../api/peralatan';
+import sewaApi from '../api/sewa';
+import masterApi from '../api/master';
+import { useApi, useMutation } from '../hooks/useApi';
+import { formatRupiah, formatTanggal } from '../utils/formatters';
+import * as Mock from '../data/mockData';
 import StatusBadge from '../components/shared/StatusBadge';
 import Modal from '../components/shared/Modal';
 import { Info, Plus, Calendar, ShieldCheck, HelpCircle, Sprout, Wrench, Wind, Droplet, Hammer, Cpu } from 'lucide-react';
@@ -14,8 +14,8 @@ import { Info, Plus, Calendar, ShieldCheck, HelpCircle, Sprout, Wrench, Wind, Dr
 export default function SewaPeralatan() {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('katalog');
-  const [peralatanList, setPeralatanList] = useState(mockPeralatan);
-  const [sewaList, setSewaList] = useState(mockDataSewa);
+  const [peralatanList, setPeralatanList] = useState(Mock.peralatan);
+  const [sewaList, setSewaList] = useState(Mock.dataSewa);
 
   const renderAlatIcon = (code) => {
     const style = { width: '40px', height: '40px' };
@@ -57,7 +57,7 @@ export default function SewaPeralatan() {
   // Add Item State (Pengurus)
   const [showAddModal, setShowAddModal] = useState(false);
   const [newItemName, setNewItemName] = useState('');
-  const [newItemKategori, setNewItemKategori] = useState(kategoriPeralatan[0]);
+  const [newItemKategori, setNewItemKategori] = useState(Mock.kategoriPeralatan[0]);
   const [newItemHarga, setNewItemHarga] = useState('');
   const [newItemStok, setNewItemStok] = useState('');
   const [newItemDeskripsi, setNewItemDeskripsi] = useState('');
@@ -280,7 +280,7 @@ export default function SewaPeralatan() {
                 className="filter-select"
                 style={{ width: '100%' }}
               >
-                {kategoriPeralatan.map(kat => (
+                {Mock.kategoriPeralatan.map(kat => (
                   <option key={kat} value={kat}>{kat}</option>
                 ))}
               </select>
@@ -602,7 +602,7 @@ export default function SewaPeralatan() {
                   onChange={(e) => setNewItemKategori(e.target.value)}
                   style={{ width: '100%' }}
                 >
-                  {kategoriPeralatan.map(cat => (
+                  {Mock.kategoriPeralatan.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>

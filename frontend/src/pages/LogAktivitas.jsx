@@ -1,10 +1,13 @@
-import { useState } from 'react';
-import { logAktivitas as mockLogs } from '../data/mockData';
+import { useState, useEffect } from 'react';
+import * as Mock from '../data/mockData';
+import { useToast } from '../context/ToastContext';
+import logApi from '../api/log';
+import { useApi } from '../hooks/useApi';
 import { FileText, Download, ShieldAlert, CheckCircle, Info, RefreshCw } from 'lucide-react';
 import StatusBadge from '../components/shared/StatusBadge';
 
 export default function LogAktivitas() {
-  const [logs, setLogs] = useState(mockLogs);
+  const [logs, setLogs] = useState(Mock.logAktivitas);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterLevel, setFilterLevel] = useState('semua');
 
@@ -47,7 +50,7 @@ export default function LogAktivitas() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button 
-              onClick={() => setLogs(mockLogs)}
+              onClick={() => setLogs(Mock.logAktivitas)}
               style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 16px', border: '1px solid var(--color-border)', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600', background: 'white', cursor: 'pointer', height: '38px', boxSizing: 'border-box' }}
             >
               <RefreshCw size={14} /> Refresh

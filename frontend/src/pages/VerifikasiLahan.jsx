@@ -1,6 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { dataLahan, daftarWilayah, jenisLahanOptions, formatTanggal } from '../data/mockData';
+import { useToast } from '../context/ToastContext';
+import verifikasiLahanApi from '../api/verifikasiLahan';
+import { useApi, useMutation } from '../hooks/useApi';
+import { formatTanggal } from '../utils/formatters';
+import * as Mock from '../data/mockData';
 import StatusBadge from '../components/shared/StatusBadge';
 import Modal from '../components/shared/Modal';
 import {
@@ -474,7 +478,7 @@ export default function VerifikasiLahan() {
   const [keputusan, setKeputusan] = useState('');
   const [catatanVerifikasi, setCatatanVerifikasi] = useState('');
   const [alasanPenolakan, setAlasanPenolakan] = useState('');
-  const [lahanList, setLahanList] = useState(dataLahan);
+  const [lahanList, setLahanList] = useState(Mock.dataLahan);
 
   const counts = useMemo(() => ({
     pending: lahanList.filter(l => l.statusVerifikasi === 'pending').length,
@@ -547,11 +551,11 @@ export default function VerifikasiLahan() {
           <span className="filter-label"><Filter size={14} /> Filter:</span>
           <select className="verifikasi-filter-select" value={filterWilayah} onChange={e => setFilterWilayah(e.target.value)}>
             <option value="">Semua Wilayah</option>
-            {daftarWilayah.map(w => <option key={w} value={w}>{w}</option>)}
+            {Mock.daftarWilayah.map(w => <option key={w} value={w}>{w}</option>)}
           </select>
           <select className="verifikasi-filter-select" value={filterJenis} onChange={e => setFilterJenis(e.target.value)}>
             <option value="">Semua Jenis</option>
-            {jenisLahanOptions.map(j => <option key={j} value={j}>{j}</option>)}
+            {Mock.jenisLahanOptions.map(j => <option key={j} value={j}>{j}</option>)}
           </select>
           <input type="date" className="verifikasi-filter-input" value={filterDateFrom} onChange={e => setFilterDateFrom(e.target.value)} placeholder="Dari" />
           <input type="date" className="verifikasi-filter-input" value={filterDateTo} onChange={e => setFilterDateTo(e.target.value)} placeholder="Sampai" />

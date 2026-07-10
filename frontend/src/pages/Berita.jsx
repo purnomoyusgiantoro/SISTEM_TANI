@@ -1,5 +1,8 @@
-import { useState } from 'react';
-import { dataBerita, formatTanggal } from '../data/mockData';
+import { useState, useEffect } from 'react';
+import beritaApi from '../api/berita';
+import { useApi } from '../hooks/useApi';
+import { formatTanggal } from '../utils/formatters';
+import * as Mock from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
 import { FileText, Sprout, TrendingUp, Calendar, User, Search, BookOpen, Newspaper } from 'lucide-react';
 
@@ -26,7 +29,7 @@ export default function Berita() {
     }
   };
 
-  const publishedBerita = dataBerita.filter((b) => b.status === 'published');
+  const publishedBerita = Mock.dataBerita.filter((b) => b.status === 'published');
   const kategoriList = ['Semua', ...new Set(publishedBerita.map((b) => b.kategori))];
 
   const filtered = publishedBerita.filter((b) => {

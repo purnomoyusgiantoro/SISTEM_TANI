@@ -1,19 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { notifikasi as mockNotifikasi } from '../../data/mockData';
+import { useNotification } from '../../context/NotificationContext';
 import { Bell, Search, Menu, User, Settings, LogOut, ChevronDown } from 'lucide-react';
 
 export default function Header({ toggleMobileSidebar }) {
   const { currentUser, logout } = useAuth();
+  const { notifications, unreadCount, fetchNotifications, markAsRead, markAllAsRead } = useNotification();
   const location = useLocation();
   const navigate = useNavigate();
   
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [notifications, setNotifications] = useState(
-    mockNotifikasi.filter(n => n.userId === currentUser?.id || currentUser?.role === 'pengurus' || currentUser?.role === 'admin')
-  );
 
   const notifRef = useRef(null);
   const profileRef = useRef(null);
@@ -62,11 +60,7 @@ export default function Header({ toggleMobileSidebar }) {
     }
   };
 
-  const unreadCount = notifications.filter(n => !n.dibaca).length;
 
-  const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, dibaca: true })));
-  };
 
   const handleLogout = () => {
     logout();

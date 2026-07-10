@@ -1,11 +1,15 @@
-import { useState } from 'react';
-import { dataBerita as mockBerita, formatTanggal } from '../data/mockData';
+import { useState, useEffect } from 'react';
+import { useToast } from '../context/ToastContext';
+import beritaApi from '../api/berita';
+import { useApi, useMutation } from '../hooks/useApi';
+import { formatTanggal } from '../utils/formatters';
+import * as Mock from '../data/mockData';
 import { Plus, Edit, Trash2, Globe, EyeOff } from 'lucide-react';
 import StatusBadge from '../components/shared/StatusBadge';
 import Modal from '../components/shared/Modal';
 
 export default function KelolaBerita() {
-  const [beritaList, setBeritaList] = useState(mockBerita);
+  const [beritaList, setBeritaList] = useState(Mock.dataBerita);
   const [selectedBerita, setSelectedBerita] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(null);

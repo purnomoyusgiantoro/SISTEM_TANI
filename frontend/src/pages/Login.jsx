@@ -19,29 +19,35 @@ export default function Login() {
     setError('');
     setLoading(true);
 
-    await new Promise((r) => setTimeout(r, 800));
-
-    const result = login(email, password);
-    if (result.success) {
+    try {
+      await login(email, password);
       navigate('/dashboard');
-    } else {
-      setError(result.error);
+    } catch (err) {
+      if (err.status === 422) {
+        setError('Email atau password salah');
+      } else if (err.status === 403) {
+        setError('Akun Anda dinonaktifkan. Hubungi admin.');
+      } else {
+        setError(err.message || 'Tidak dapat terhubung ke server');
+      }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleQuickLogin = async (role) => {
     setError('');
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 400));
-    const result = loginAsRole(role);
-    if (result.success) {
+    try {
+      await loginAsRole(role);
       navigate('/dashboard');
-    } else {
-      setError(result.error);
+    } catch (err) {
+      setError(err.message || 'Gagal login. Pastikan backend sudah berjalan.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
+
 
   const roleButtons = [
     { role: 'petani', label: 'Petani', icon: User },

@@ -1,12 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import * as Mock from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
-import { strukturOrganisasi as mockStruktur } from '../data/mockData';
+import { useToast } from '../context/ToastContext';
+import organisasiApi from '../api/organisasi';
+import { useApi, useMutation } from '../hooks/useApi';
 import Modal from '../components/shared/Modal';
 import { User, Plus, Edit, Trash2 } from 'lucide-react';
 
 export default function StrukturOrganisasi() {
   const { currentUser } = useAuth();
-  const [treeData, setTreeData] = useState(mockStruktur);
+  const [treeData, setTreeData] = useState(Mock.strukturOrganisasi);
   const [selectedNode, setSelectedNode] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 

@@ -1,15 +1,20 @@
-import { useState } from 'react';
-import { dataLahan, daftarWilayah, formatRupiah } from '../data/mockData';
+import { useState, useEffect } from 'react';
+import lahanApi from '../api/lahan';
+import kegiatanApi from '../api/kegiatan';
+import dashboardApi from '../api/dashboard';
+import { useApi } from '../hooks/useApi';
+import { formatRupiah } from '../utils/formatters';
+import * as Mock from '../data/mockData';
 import { BarChart2, PieChart, Map, FileDown, Download } from 'lucide-react';
 
 export default function AnalisisData() {
   const [filterPeriod, setFilterPeriod] = useState('6Bulan');
 
   // Math Statistics
-  const totalLahan = dataLahan.length;
-  const totalLuas = dataLahan.reduce((sum, item) => sum + item.luas, 0).toFixed(1);
+  const totalLahan = Mock.dataLahan.length;
+  const totalLuas = Mock.dataLahan.reduce((sum, item) => sum + item.luas, 0).toFixed(1);
   const avgLuas = (totalLuas / totalLahan).toFixed(2);
-  const verifiedLahan = dataLahan.filter(l => l.statusVerifikasi === 'terverifikasi').length;
+  const verifiedLahan = Mock.dataLahan.filter(l => l.statusVerifikasi === 'terverifikasi').length;
 
   return (
     <div style={{ animation: 'fadeIn 0.3s ease' }}>

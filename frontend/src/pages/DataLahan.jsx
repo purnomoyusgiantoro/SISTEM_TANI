@@ -1,11 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-import {
-  dataLahan,
-  daftarWilayah,
-  jenisLahanOptions,
-  formatTanggal,
-} from '../data/mockData';
+import { useToast } from '../context/ToastContext';
+import lahanApi from '../api/lahan';
+import masterApi from '../api/master';
+import { useApi, useMutation } from '../hooks/useApi';
+import { formatTanggal } from '../utils/formatters';
 import StatusBadge from '../components/shared/StatusBadge';
 import Modal from '../components/shared/Modal';
 import {
@@ -68,6 +67,15 @@ const emptyForm = {
 
 export default function DataLahan() {
   const { currentUser, hasPermission } = useAuth();
+  const toast = useToast();
+
+  // API data
+  const { data: lahanData, loading: lahanLoading, execute: fetchLahan } = useApi(lahanApi.getAll);
+  const { data: wilayahData, execute: fetchWilayah } = useApi(masterApi.getWilayah);
+  const { data: jenisLahanData, execute: fetchJenisLahan } = useApi(masterApi.getJenisLahan);
+  const { mutate: createLahan, loading: creating } = useMutation(lahanApi.create);
+  const { mutate: updateLahan, loading: updating } = useMutation(lahanApi.update);
+  const { mutate: deleteLahan } = useMutation(lahanApi.delete);
 
   // Filters
   const [filterWilayah, setFilterWilayah] = useState('');
@@ -83,13 +91,27 @@ export default function DataLahan() {
   const [detailLahan, setDetailLahan] = useState(null);
   const [formData, setFormData] = useState({ ...emptyForm });
 
+  // Fetch data on mount
+  useEffect(() => {
+    fetchLahan();
+    fetchWilayah();
+    fetchJenisLahan();
+  }, [fetchLahan, fetchWilayah, fetchJenisLahan]);
+
+  // Master data options
+  const daftarWilayah = wilayahData || [];
+  const jenisLahanOptions = jenisLahanData || [];
+
+  // Data array
+  const dataLahan = Array.isArray(lahanData) ? lahanData : [];
+
   // Role-based data
   const baseData = useMemo(() => {
     if (currentUser?.role === 'petani') {
-      return dataLahan.filter((l) => l.pemilikId === currentUser.id);
+      return dataLahan.filter((l) => l.pemilikId === currentUser.id || l.pemilik_id === currentUser.id);
     }
     return dataLahan;
-  }, [currentUser]);
+  }, [currentUser, dataLahan]);
 
   // Filtered data
   const filteredData = useMemo(() => {
@@ -274,7 +296,7 @@ export default function DataLahan() {
                     </td>
                     <td>
                       <div className="lahan-cell-pemilik">
-                        <span>{lahan.pemilik}</span>
+                        <span>{lahan.pemilik?.nama || lahan.pemilik || '-'}</span>
                       </div>
                     </td>
                     <td>
@@ -287,10 +309,10 @@ export default function DataLahan() {
                       <strong>{lahan.luas}</strong>
                     </td>
                     <td>
-                      <span className="lahan-jenis-badge">{lahan.jenisLahan}</span>
+                      <span className="lahan-jenis-badge">{lahan.jenis_lahan || lahan.jenisLahan}</span>
                     </td>
                     <td>
-                      <StatusBadge status={lahan.statusVerifikasi} />
+                      <StatusBadge status={lahan.status_verifikasi || lahan.statusVerifikasi} />
                     </td>
                     <td>
                       <div className="lahan-actions">
@@ -494,13 +516,13 @@ export default function DataLahan() {
               <div className="lahan-detail-card">
                 <div className="lahan-detail-header">
                   <div className="lahan-detail-header-info">
-                    <h3 className="lahan-detail-name">{detailLahan.pemilik}</h3>
+                    <h3 className="lahan-detail-name">{detailLahan.pemilik?.nama || detailLahan.pemilik || '-'}</h3>
                     <p className="lahan-detail-loc">
                       <MapPin size={13} />
                       {detailLahan.lokasi}
                     </p>
                   </div>
-                  <StatusBadge status={detailLahan.statusVerifikasi} />
+                  <StatusBadge status={detailLahan.status_verifikasi || detailLahan.statusVerifikasi} />
                 </div>
 
                 <div className="lahan-detail-grid">
@@ -516,7 +538,7 @@ export default function DataLahan() {
                       <Leaf size={14} />
                       Jenis Lahan
                     </span>
-                    <span className="lahan-detail-item-value">{detailLahan.jenisLahan}</span>
+                    <span className="lahan-detail-item-value">{detailLahan.jenis_lahan || detailLahan.jenisLahan}</span>
                   </div>
                   <div className="lahan-detail-item">
                     <span className="lahan-detail-item-label">
@@ -530,7 +552,7 @@ export default function DataLahan() {
                       <Calendar size={14} />
                       Tanggal Daftar
                     </span>
-                    <span className="lahan-detail-item-value">{formatTanggal(detailLahan.tanggalDaftar)}</span>
+                    <span className="lahan-detail-item-value">{formatTanggal(detailLahan.tanggal_daftar || detailLahan.tanggalDaftar)}</span>
                   </div>
                 </div>
 
@@ -555,7 +577,7 @@ export default function DataLahan() {
               </div>
 
               {/* Verification History */}
-              {detailLahan.statusVerifikasi === 'terverifikasi' && (
+              {(detailLahan.status_verifikasi === 'terverifikasi' || detailLahan.statusVerifikasi === 'terverifikasi') && (
                 <div className="lahan-detail-history">
                   <h4 className="lahan-detail-section-title">
                     <Clock size={16} />

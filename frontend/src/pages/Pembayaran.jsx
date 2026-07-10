@@ -1,6 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { dataTagihan, dataSewa, formatRupiah, formatTanggal } from '../data/mockData';
+import { useToast } from '../context/ToastContext';
+import tagihanApi from '../api/tagihan';
+import { useApi, useMutation } from '../hooks/useApi';
+import { formatRupiah, formatTanggal } from '../utils/formatters';
+import * as Mock from '../data/mockData';
 import {
   CreditCard, AlertCircle, Clock, CheckCircle2, Upload,
   FileText, Search, Filter, ChevronDown, X, Check,
@@ -66,7 +70,7 @@ export default function Pembayaran() {
   const isPengurus = role === 'pengurus';
 
   const [activeTab, setActiveTab] = useState('tagihan');
-  const [tagihan, setTagihan] = useState(dataTagihan);
+  const [tagihan, setTagihan] = useState(Mock.dataTagihan);
   const [searchQuery, setSearchQuery] = useState('');
 
   /* upload bukti bayar state */
