@@ -377,7 +377,7 @@ export default function Pembayaran() {
                     <Upload size={32} color="#a0aec0" />
                     <p>Seret file ke sini atau <strong>klik untuk memilih</strong></p>
                     <p style={{ fontSize: 12, color: '#a0aec0' }}>Format: JPG, PNG, PDF (Maks. 5MB)</p>
-                    {uploadFile && <p className="file-name">📎 {uploadFile.name}</p>}
+                    {uploadFile && <p className="file-name"> {uploadFile.name}</p>}
                   </div>
                   <input
                     id="pembayaran-file-input"

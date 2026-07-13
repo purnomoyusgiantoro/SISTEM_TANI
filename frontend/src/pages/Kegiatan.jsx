@@ -389,7 +389,7 @@ export default function Kegiatan() {
                 <Camera size={28} color="#a0aec0" />
                 <p>Klik untuk memilih foto</p>
                 <p style={{ fontSize: 11, color: '#a0aec0' }}>JPG, PNG (Maks. 5MB)</p>
-                {formFoto && <p className="file-name">📎 {formFoto.name}</p>}
+                {formFoto && <p className="file-name"> {formFoto.name}</p>}
               </div>
               <input
                 id="kegiatan-foto-input"

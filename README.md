@@ -164,6 +164,9 @@ RuangTani/
 │   │   │   ├── formatters.js       # Format tanggal, mata uang, dll.
 │   │   │   └── validators.js       # Validasi form
 │   │   │
+│   │   ├── styles/                 # Eksternal CSS
+│   │   │   └── pages/              # CSS khusus untuk setiap halaman (DataLahan.css, dll)
+│   │   │
 │   │   ├── pages/                  # Halaman utama aplikasi
 │   │   │   ├── LandingPage.jsx     # Halaman landing publik
 │   │   │   ├── Login.jsx           # Halaman login
