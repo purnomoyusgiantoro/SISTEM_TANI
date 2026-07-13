@@ -5,6 +5,7 @@ import { ToastProvider } from './context/ToastContext';
 import { NotificationProvider } from './context/NotificationContext';
 import Layout from './components/layout/Layout';
 import LoadingSpinner from './components/shared/LoadingSpinner';
+import ErrorBoundary from './components/shared/ErrorBoundary';
 
 // ── Lazy-loaded pages (code splitting) ──
 const LandingPage = lazy(() => import('./pages/LandingPage'));
@@ -38,13 +39,14 @@ function ProtectedRoute({ children, allowedRoles }) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  return <Layout>{children}</Layout>;
+  return <Layout><ErrorBoundary>{children}</ErrorBoundary></Layout>;
 }
 
 function AppRoutes() {
   const { isAuthenticated } = useAuth();
 
   return (
+    <ErrorBoundary>
     <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route
@@ -159,6 +161,7 @@ function AppRoutes() {
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Suspense>
+    </ErrorBoundary>
   );
 }
 

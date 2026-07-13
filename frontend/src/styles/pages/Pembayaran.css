@@ -1,0 +1,108 @@
+.pembayaran-page { font-family: var(--font-sans); color: var(--color-text); }
+        .pembayaran-header { display: none; }
+
+        /* summary cards */
+        .pembayaran-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px; }
+        .pembayaran-summary-card { background: #fff; border-radius: 8px; padding: 20px; border: 1px solid var(--color-border); display: flex; align-items: center; gap: 14px; transition: transform .15s; }
+        .pembayaran-summary-card:hover { transform: translateY(-2px); }
+        .pembayaran-summary-icon { width: 48px; height: 48px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .pembayaran-summary-info { flex: 1; }
+        .pembayaran-summary-label { font-size: 13px; color: #4a5568; margin: 0 0 4px; }
+        .pembayaran-summary-value { font-size: 22px; font-weight: 700; color: #1a202c; margin: 0; }
+
+        /* tabs */
+        .pembayaran-tabs { display: flex; gap: 4px; background: #f0f4f8; border-radius: 8px; padding: 4px; margin-bottom: 24px; overflow-x: auto; }
+        .pembayaran-tab { padding: 10px 20px; border-radius: 8px; border: 1px solid transparent; background: transparent; color: #64748b; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all .2s; }
+        .pembayaran-tab:hover { color: #1e293b; }
+        .pembayaran-tab.active { background: #fff; color: #1e293b; border-color: var(--color-border); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+        /* search */
+        .pembayaran-search-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .pembayaran-search { flex: 1; max-width: 400px; display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--color-border); border-radius: 8px; height: 38px; padding: 0 14px; box-sizing: border-box; }
+        .pembayaran-search input { border: none; outline: none; flex: 1; font-size: 14px; color: #1a202c; background: transparent; }
+        .pembayaran-search input::placeholder { color: #a0aec0; }
+
+        /* tagihan cards */
+        .pembayaran-card-list { display: flex; flex-direction: column; gap: 14px; }
+        .pembayaran-card { background: #fff; border-radius: 8px; padding: 20px; border: 1px solid var(--color-border); display: flex; flex-wrap: wrap; align-items: center; gap: 16px; transition: transform .15s; }
+        .pembayaran-card:hover { transform: translateY(-1px); }
+        .pembayaran-card-main { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 4px; }
+        .pembayaran-card-id { font-size: 13px; font-weight: 600; color: #64748b; margin: 0; font-family: monospace; }
+        .pembayaran-card-equipment { font-size: 17px; font-weight: 700; color: #1e293b; margin: 0; }
+        .pembayaran-card-petani { font-size: 13px; color: #4a5568; margin: 0; }
+        .pembayaran-card-due { font-size: 13px; color: #64748b; margin: 0; display: flex; align-items: center; gap: 6px; }
+        .pembayaran-card-due.overdue { color: #dc2626; font-weight: 600; }
+        .pembayaran-card-right { display: flex; align-items: center; gap: 32px; flex-wrap: wrap; }
+        .pembayaran-card-amount { text-align: right; min-width: 120px; }
+        .pembayaran-card-amount-value { font-size: 20px; font-weight: 700; color: #1e293b; margin: 0; }
+        .pembayaran-card-actions { display: flex; align-items: center; gap: 12px; }
+        .pembayaran-btn { padding: 8px 18px; border-radius: 8px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: 6px; }
+        .pembayaran-btn-primary { background: #1a365d; color: #fff; }
+        .pembayaran-btn-primary:hover { background: #2d4a7a; }
+        .pembayaran-btn-success { background: #059669; color: #fff; }
+        .pembayaran-btn-success:hover { background: #047857; }
+        .pembayaran-btn-danger { background: #dc2626; color: #fff; }
+        .pembayaran-btn-danger:hover { background: #b91c1c; }
+        .pembayaran-btn-outline { background: transparent; border: 1px solid #e2e8f0; color: #4a5568; }
+        .pembayaran-btn-outline:hover { border-color: #1a365d; color: #1a365d; }
+        .pembayaran-empty { text-align: center; padding: 48px 20px; color: #a0aec0; }
+        .pembayaran-empty svg { margin-bottom: 12px; }
+        .pembayaran-empty p { margin: 0; font-size: 15px; }
+
+        /* table */
+        .pembayaran-table-wrap { overflow-x: auto; background: #fff; border-radius: 8px; border: 1px solid var(--color-border); }
+        .pembayaran-table { width: 100%; min-width: 900px; border-collapse: collapse; font-size: 14px; table-layout: fixed; }
+        .pembayaran-table th { text-align: left; padding: 14px 16px; background: #f0f4f8; color: #4a5568; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--color-border); white-space: nowrap; }
+        .pembayaran-table td { padding: 14px 16px; border-bottom: 1px solid var(--color-border-light); color: #1a202c; }
+        .pembayaran-table tr:last-child td { border-bottom: none; }
+        .pembayaran-table tr:hover td { background: #f7fafc; }
+
+        /* upload form */
+        .pembayaran-form { background: #fff; border-radius: 8px; padding: 28px; border: 1px solid var(--color-border); max-width: 600px; }
+        .pembayaran-form-group { margin-bottom: 20px; }
+        .pembayaran-form-group label { display: block; font-size: 14px; font-weight: 600; color: #1a202c; margin-bottom: 6px; }
+        .pembayaran-form-group select,
+        .pembayaran-form-group input[type="text"],
+        .pembayaran-form-group input[type="number"],
+        .pembayaran-form-group input[type="date"],
+        .pembayaran-form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--color-border); border-radius: 6px; font-size: 14px; color: #1a202c; background: #fff; box-sizing: border-box; transition: border .2s; }
+        .pembayaran-form-group select:focus,
+        .pembayaran-form-group input:focus,
+        .pembayaran-form-group textarea:focus { outline: none; border-color: var(--color-text-muted); }
+        .pembayaran-form-group textarea { min-height: 80px; resize: vertical; }
+
+        .pembayaran-dropzone { border: 2px dashed var(--color-border); border-radius: 8px; padding: 32px; text-align: center; cursor: pointer; transition: all .2s; background: #f7fafc; }
+        .pembayaran-dropzone:hover, .pembayaran-dropzone.drag-over { border-color: var(--color-text-muted); background: #f8fafc; }
+        .pembayaran-dropzone p { margin: 8px 0 0; font-size: 14px; color: #4a5568; }
+        .pembayaran-dropzone .file-name { margin-top: 10px; font-size: 13px; font-weight: 600; color: #059669; }
+
+        .pembayaran-success-msg { background: #dcfce7; border: 1px solid #86efac; border-radius: 8px; padding: 20px; text-align: center; color: #166534; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; animation: pembayaran-fadein .3s ease; }
+
+        /* verifikasi list */
+        .pembayaran-verif-card { background: #fff; border-radius: 8px; padding: 20px; border: 1px solid var(--color-border); margin-bottom: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+        .pembayaran-verif-info { flex: 1; min-width: 200px; }
+        .pembayaran-verif-info h4 { margin: 0 0 4px; font-size: 15px; color: #1a202c; }
+        .pembayaran-verif-info p { margin: 0; font-size: 13px; color: #4a5568; }
+
+        /* modal */
+        .pembayaran-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; z-index: 1000; animation: pembayaran-fadein .2s ease; }
+        .pembayaran-modal { background: #fff; border-radius: 8px; width: 90%; max-width: 440px; border: 1px solid var(--color-border); animation: pembayaran-slideup .25s ease; }
+        .pembayaran-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid #e2e8f0; }
+        .pembayaran-modal-header h3 { margin: 0; font-size: 17px; color: #1a202c; }
+        .pembayaran-modal-close { background: none; border: none; cursor: pointer; color: #a0aec0; padding: 4px; border-radius: 6px; }
+        .pembayaran-modal-close:hover { color: #1a202c; background: #f0f4f8; }
+        .pembayaran-modal-body { padding: 24px; }
+        .pembayaran-modal-body p { margin: 0 0 20px; font-size: 14px; color: #4a5568; line-height: 1.6; }
+        .pembayaran-modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+        @keyframes pembayaran-fadein { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pembayaran-slideup { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 640px) {
+          .pembayaran-page { padding: 16px; }
+          .pembayaran-summary { grid-template-columns: 1fr 1fr; }
+          .pembayaran-card { flex-direction: column; align-items: stretch; }
+          .pembayaran-card-amount { text-align: left; }
+          .pembayaran-tabs { gap: 2px; }
+          .pembayaran-tab { padding: 8px 14px; font-size: 13px; }
+        }

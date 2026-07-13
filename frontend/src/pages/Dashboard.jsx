@@ -26,6 +26,8 @@ import {
   Download
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import '../styles/pages/Dashboard.css';
+
 
 export default function Dashboard() {
   const { currentUser } = useAuth();
@@ -35,7 +37,7 @@ export default function Dashboard() {
   const role = currentUser?.role || 'petani';
 
   useEffect(() => {
-    fetchStats();
+    fetchStats().catch(() => {});
   }, [fetchStats]);
 
   const stats = statsData || {};
@@ -365,13 +367,7 @@ export default function Dashboard() {
       {!loading && !error && role === 'bpp' && renderBPPDashboard()}
       {!loading && !error && role === 'admin' && renderAdminDashboard()}
 
-      <style>{`
-        @media (max-width: 900px) {
-          .layout-col-mobile {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
+      
     </div>
   );
 }

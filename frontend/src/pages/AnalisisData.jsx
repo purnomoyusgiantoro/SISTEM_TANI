@@ -6,6 +6,8 @@ import { useApi } from '../hooks/useApi';
 import { formatRupiah } from '../utils/formatters';
 import * as Mock from '../data/mockData';
 import { BarChart2, PieChart, Map, FileDown, Download } from 'lucide-react';
+import '../styles/pages/AnalisisData.css';
+
 
 export default function AnalisisData() {
   const [filterPeriod, setFilterPeriod] = useState('6Bulan');
@@ -222,13 +224,7 @@ export default function AnalisisData() {
           </table>
         </div>
       </div>
-      <style>{`
-        @media (max-width: 900px) {
-          .layout-col-mobile {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
+      
         </div>
       </div>
     </div>

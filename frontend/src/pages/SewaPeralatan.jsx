@@ -10,6 +10,8 @@ import * as Mock from '../data/mockData';
 import StatusBadge from '../components/shared/StatusBadge';
 import Modal from '../components/shared/Modal';
 import { Info, Plus, Calendar, ShieldCheck, HelpCircle, Sprout, Wrench, Wind, Droplet, Hammer, Cpu } from 'lucide-react';
+import '../styles/pages/SewaPeralatan.css';
+
 
 export default function SewaPeralatan() {
   const { currentUser } = useAuth();
@@ -174,66 +176,7 @@ export default function SewaPeralatan() {
 
   return (
     <div style={{ animation: 'fadeIn 0.3s ease' }}>
-      <style>{`
-        .sewa-tabs {
-          display: flex;
-          border-bottom: 2px solid var(--color-border);
-          margin-bottom: 24px;
-        }
-        .sewa-tab-btn {
-          padding: 10px 20px;
-          font-weight: 600;
-          color: var(--color-text-secondary);
-          border-bottom: 2px solid transparent;
-          margin-bottom: -2px;
-          cursor: pointer;
-        }
-        .sewa-tab-btn.active {
-          color: var(--color-primary);
-          border-bottom-color: var(--color-primary);
-        }
-        .alat-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-          gap: 20px;
-        }
-        .alat-card {
-          background: white;
-          border: 1px solid var(--color-border);
-          border-radius: 12px;
-          overflow: hidden;
-          box-shadow: var(--shadow-sm);
-          transition: all 0.2s;
-        }
-        .alat-card:hover {
-          transform: translateY(-4px);
-          box-shadow: var(--shadow-md);
-        }
-        .alat-card-image {
-          height: 140px;
-          background: #f7fafc;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 3.5rem;
-          border-bottom: 1px solid var(--color-border);
-        }
-        .alat-card-body {
-          padding: 16px;
-        }
-        .filters-row {
-          display: flex;
-          gap: 12px;
-          margin-bottom: 20px;
-          flex-wrap: wrap;
-        }
-        .filter-select, .filter-input {
-          padding: 8px 12px;
-          font-size: 0.9rem;
-          border: 1px solid var(--color-border);
-          border-radius: 6px;
-        }
-      `}</style>
+      
       {/* Main Admin Card */}
       <div className="admin-card">
         

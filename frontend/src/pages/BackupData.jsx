@@ -5,6 +5,8 @@ import backupApi from '../api/backup';
 import { useApi, useMutation } from '../hooks/useApi';
 import { Database, Download, UploadCloud, Trash2, Calendar, HardDrive, ShieldAlert } from 'lucide-react';
 import Modal from '../components/shared/Modal';
+import '../styles/pages/BackupData.css';
+
 
 export default function BackupData() {
   const [backups, setBackups] = useState([
@@ -221,13 +223,7 @@ export default function BackupData() {
           </div>
         </Modal>
       )}
-      <style>{`
-        @media (max-width: 900px) {
-          .layout-col-mobile {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
+      
           </div>
         </div>
     </div>

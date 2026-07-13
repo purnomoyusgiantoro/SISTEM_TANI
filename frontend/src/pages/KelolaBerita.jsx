@@ -7,6 +7,8 @@ import * as Mock from '../data/mockData';
 import { Plus, Edit, Trash2, Globe, EyeOff } from 'lucide-react';
 import StatusBadge from '../components/shared/StatusBadge';
 import Modal from '../components/shared/Modal';
+import '../styles/pages/KelolaBerita.css';
+
 
 export default function KelolaBerita() {
   const [beritaList, setBeritaList] = useState(Mock.dataBerita);
@@ -76,60 +78,7 @@ export default function KelolaBerita() {
 
   return (
     <div style={{ animation: 'fadeIn 0.3s ease' }}>
-      <style>{`
-        .kelola-berita-table-wrapper {
-          overflow-x: auto;
-          background: #fff;
-          border-radius: 8px;
-          border: 1px solid var(--color-border);
-        }
-        .kelola-berita-table {
-          width: 100%;
-          min-width: 900px;
-          border-collapse: collapse;
-          font-size: 14px;
-          table-layout: fixed;
-        }
-        .kelola-berita-table th {
-          text-align: left;
-          padding: 14px 16px;
-          background: #f0f4f8;
-          color: #4a5568;
-          font-weight: 600;
-          font-size: 12px;
-          text-transform: uppercase;
-          letter-spacing: .5px;
-          border-bottom: 1px solid var(--color-border);
-          white-space: nowrap;
-        }
-        .kelola-berita-table td {
-          padding: 14px 16px;
-          border-bottom: 1px solid var(--color-border-light);
-          color: #1a202c;
-          vertical-align: top;
-        }
-        .kelola-berita-table tr:last-child td { border-bottom: none; }
-        .kelola-berita-table tr:hover td { background: #f7fafc; }
-        .kelola-berita-action-btn {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          padding: 6px 12px;
-          border-radius: 6px;
-          font-size: 12px;
-          font-weight: 600;
-          cursor: pointer;
-        }
-        .kelola-berita-btn-edit {
-          border: 1px solid var(--color-border);
-          background: #fff;
-        }
-        .kelola-berita-btn-delete {
-          border: 1px solid var(--color-danger);
-          color: var(--color-danger);
-          background: #fff;
-        }
-      `}</style>
+      
       <div className="admin-card">
         {/* Header Row Inside Card */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #dee2e6' }}>
