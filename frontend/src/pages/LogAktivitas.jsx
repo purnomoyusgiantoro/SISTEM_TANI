@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import * as Mock from '../data/mockData';
 import { useToast } from '../context/ToastContext';
 import logApi from '../api/log';
 import { useApi } from '../hooks/useApi';
@@ -7,16 +6,23 @@ import { FileText, Download, ShieldAlert, CheckCircle, Info, RefreshCw } from 'l
 import StatusBadge from '../components/shared/StatusBadge';
 
 export default function LogAktivitas() {
-  const [logs, setLogs] = useState(Mock.logAktivitas);
+  const { data: logsData, loading, execute: fetchLogs } = useApi(logApi.getAll);
+
+  useEffect(() => {
+    fetchLogs().catch(() => {});
+  }, [fetchLogs]);
+
+  const logs = Array.isArray(logsData) ? logsData : [];
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filterLevel, setFilterLevel] = useState('semua');
 
   // Filter logs logic
   const filteredLogs = logs.filter(log => {
     const matchSearch = searchQuery === '' || 
-      log.user.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      log.aksi.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      log.detail.toLowerCase().includes(searchQuery.toLowerCase());
+      (log.user || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
+      (log.aksi || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (log.detail || '').toLowerCase().includes(searchQuery.toLowerCase());
       
     const matchLevel = filterLevel === 'semua' || log.level === filterLevel;
     

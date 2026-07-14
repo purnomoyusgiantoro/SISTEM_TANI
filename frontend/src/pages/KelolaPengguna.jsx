@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import * as Mock from '../data/mockData';
 import { useToast } from '../context/ToastContext';
 import usersApi from '../api/users';
 import { useApi, useMutation } from '../hooks/useApi';
@@ -8,7 +7,20 @@ import StatusBadge from '../components/shared/StatusBadge';
 import Modal from '../components/shared/Modal';
 
 export default function KelolaPengguna() {
-  const [usersList, setUsersList] = useState(Mock.users);
+  const toast = useToast();
+
+  const { data: usersData, loading: loadingUsers, execute: fetchUsers } = useApi(usersApi.getAll);
+  const { mutate: createUser } = useMutation(usersApi.create);
+  const { mutate: updateUser } = useMutation(usersApi.update);
+  const { mutate: deleteUser } = useMutation(usersApi.delete);
+  const { mutate: toggleStatus } = useMutation(usersApi.toggleStatus);
+
+  useEffect(() => {
+    fetchUsers().catch(() => {});
+  }, [fetchUsers]);
+
+  const usersList = Array.isArray(usersData) ? usersData : [];
+
   const [selectedUser, setSelectedUser] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(null);
@@ -19,52 +31,51 @@ export default function KelolaPengguna() {
   const [role, setRole] = useState('petani');
   const [status, setStatus] = useState('aktif');
 
-  const handleCreate = (e) => {
+  const handleCreate = async (e) => {
     e.preventDefault();
-    const newUser = {
-      id: usersList.length + 1,
-      nama,
-      email,
-      role,
-      status,
-      avatar: null,
-      lastLogin: '-'
-    };
-    setUsersList([...usersList, newUser]);
-    setShowAddModal(false);
-    resetForm();
+    try {
+      await createUser({ nama, email, role, status });
+      toast.success('Pengguna berhasil ditambahkan');
+      fetchUsers();
+      setShowAddModal(false);
+      resetForm();
+    } catch (err) {
+      toast.error(err.message || 'Gagal menambahkan pengguna');
+    }
   };
 
-  const handleEdit = (e) => {
+  const handleEdit = async (e) => {
     e.preventDefault();
-    setUsersList(prev => prev.map(u => {
-      if (u.id === selectedUser.id) {
-        return {
-          ...u,
-          nama,
-          email,
-          role,
-          status
-        };
-      }
-      return u;
-    }));
-    setSelectedUser(null);
-    resetForm();
+    try {
+      await updateUser(selectedUser.id, { nama, email, role, status });
+      toast.success('Pengguna berhasil diperbarui');
+      fetchUsers();
+      setSelectedUser(null);
+      resetForm();
+    } catch (err) {
+      toast.error(err.message || 'Gagal memperbarui pengguna');
+    }
   };
 
-  const toggleUserStatus = (userId) => {
-    setUsersList(prev => prev.map(u => {
-      if (u.id === userId) {
-        return { ...u, status: u.status === 'aktif' ? 'nonaktif' : 'aktif' };
-      }
-      return u;
-    }));
+  const toggleUserStatus = async (userId) => {
+    try {
+      await toggleStatus(userId);
+      toast.success('Status pengguna berhasil diubah');
+      fetchUsers();
+    } catch (err) {
+      toast.error(err.message || 'Gagal mengubah status');
+    }
   };
 
-  const handleDelete = () => {
-    setUsersList(prev => prev.filter(u => u.id !== showDeleteModal.id));
-    setShowDeleteModal(null);
+  const handleDelete = async () => {
+    try {
+      await deleteUser(showDeleteModal.id);
+      toast.success('Pengguna berhasil dihapus');
+      fetchUsers();
+      setShowDeleteModal(null);
+    } catch (err) {
+      toast.error(err.message || 'Gagal menghapus pengguna');
+    }
   };
 
   const resetForm = () => {

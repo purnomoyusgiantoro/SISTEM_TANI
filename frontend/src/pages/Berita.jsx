@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import beritaApi from '../api/berita';
 import { useApi } from '../hooks/useApi';
 import { formatTanggal } from '../utils/formatters';
-import * as Mock from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
 import { FileText, Sprout, TrendingUp, Calendar, User, Search, BookOpen, Newspaper } from 'lucide-react';
 import '../styles/pages/Berita.css';
@@ -13,6 +12,12 @@ export default function Berita() {
   const [selectedKategori, setSelectedKategori] = useState('Semua');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBerita, setSelectedBerita] = useState(null);
+
+  const { data: beritaData, loading, execute: fetchBerita } = useApi(beritaApi.getAll);
+
+  useEffect(() => {
+    fetchBerita({ status: 'published' }).catch(() => {});
+  }, [fetchBerita]);
 
   const renderBeritaIcon = (category, size = 36) => {
     switch (category) {
@@ -31,17 +36,22 @@ export default function Berita() {
     }
   };
 
-  const publishedBerita = Mock.dataBerita.filter((b) => b.status === 'published');
-  const kategoriList = ['Semua', ...new Set(publishedBerita.map((b) => b.kategori))];
+  const publishedBerita = Array.isArray(beritaData) ? beritaData : [];
+  
+  const kategoriList = useMemo(() => {
+    return ['Semua', ...new Set(publishedBerita.map((b) => b.kategori))];
+  }, [publishedBerita]);
 
-  const filtered = publishedBerita.filter((b) => {
-    const matchKategori = selectedKategori === 'Semua' || b.kategori === selectedKategori;
-    const matchSearch =
-      searchQuery === '' ||
-      b.judul.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      b.isi.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchKategori && matchSearch;
-  });
+  const filtered = useMemo(() => {
+    return publishedBerita.filter((b) => {
+      const matchKategori = selectedKategori === 'Semua' || b.kategori === selectedKategori;
+      const matchSearch =
+        searchQuery === '' ||
+        (b.judul || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (b.isi || '').toLowerCase().includes(searchQuery.toLowerCase());
+      return matchKategori && matchSearch;
+    });
+  }, [publishedBerita, selectedKategori, searchQuery]);
 
   return (
     <div className="berita-page">

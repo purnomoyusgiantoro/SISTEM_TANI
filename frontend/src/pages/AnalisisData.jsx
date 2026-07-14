@@ -4,7 +4,6 @@ import kegiatanApi from '../api/kegiatan';
 import dashboardApi from '../api/dashboard';
 import { useApi } from '../hooks/useApi';
 import { formatRupiah } from '../utils/formatters';
-import * as Mock from '../data/mockData';
 import { BarChart2, PieChart, Map, FileDown, Download } from 'lucide-react';
 import '../styles/pages/AnalisisData.css';
 
@@ -12,11 +11,19 @@ import '../styles/pages/AnalisisData.css';
 export default function AnalisisData() {
   const [filterPeriod, setFilterPeriod] = useState('6Bulan');
 
+  const { data: lahanData, loading, execute: fetchLahan } = useApi(lahanApi.getAll);
+
+  useEffect(() => {
+    fetchLahan().catch(() => {});
+  }, [fetchLahan]);
+
+  const lahanList = Array.isArray(lahanData) ? lahanData : [];
+
   // Math Statistics
-  const totalLahan = Mock.dataLahan.length;
-  const totalLuas = Mock.dataLahan.reduce((sum, item) => sum + item.luas, 0).toFixed(1);
-  const avgLuas = (totalLuas / totalLahan).toFixed(2);
-  const verifiedLahan = Mock.dataLahan.filter(l => l.statusVerifikasi === 'terverifikasi').length;
+  const totalLahan = lahanList.length;
+  const totalLuas = lahanList.reduce((sum, item) => sum + (parseFloat(item.luas) || 0), 0).toFixed(1);
+  const avgLuas = totalLahan > 0 ? (totalLuas / totalLahan).toFixed(2) : '0.00';
+  const verifiedLahan = lahanList.filter(l => l.status_verifikasi === 'terverifikasi' || l.statusVerifikasi === 'terverifikasi').length;
 
   return (
     <div style={{ animation: 'fadeIn 0.3s ease' }}>

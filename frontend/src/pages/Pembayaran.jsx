@@ -4,7 +4,6 @@ import { useToast } from '../context/ToastContext';
 import tagihanApi from '../api/tagihan';
 import { useApi, useMutation } from '../hooks/useApi';
 import { formatRupiah, formatTanggal } from '../utils/formatters';
-import * as Mock from '../data/mockData';
 import '../styles/pages/Pembayaran.css';
 
 import {
@@ -67,13 +66,24 @@ function Modal({ open, onClose, title, children }) {
 /* ══════════════ MAIN COMPONENT ══════════════ */
 export default function Pembayaran() {
   const { currentUser } = useAuth();
+  const toast = useToast();
   const role = currentUser?.role || 'petani';
   const isPetani = role === 'petani';
   const isPengurus = role === 'pengurus';
 
   const [activeTab, setActiveTab] = useState('tagihan');
-  const [tagihan, setTagihan] = useState(Mock.dataTagihan);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // API hooks
+  const { data: tagihanData, loading: tagihanLoading, execute: fetchTagihan } = useApi(tagihanApi.getAll);
+  const { mutate: uploadBukti, loading: uploading } = useMutation(tagihanApi.uploadBukti);
+  const { mutate: verifikasiTagihan } = useMutation(tagihanApi.verifikasi);
+
+  useEffect(() => {
+    fetchTagihan().catch(() => {});
+  }, [fetchTagihan]);
+
+  const tagihan = Array.isArray(tagihanData) ? tagihanData : [];
 
   /* upload bukti bayar state */
   const [selectedTagihan, setSelectedTagihan] = useState('');
@@ -90,33 +100,32 @@ export default function Pembayaran() {
 
   /* ── computed ── */
   const myTagihan = useMemo(() => {
-    if (isPetani) return tagihan.filter((t) => t.petaniId === currentUser?.id);
     return tagihan;
-  }, [tagihan, currentUser, isPetani]);
+  }, [tagihan]);
 
   const filtered = useMemo(() => {
     if (!searchQuery) return myTagihan;
     const q = searchQuery.toLowerCase();
     return myTagihan.filter(
       (t) =>
-        t.id.toLowerCase().includes(q) ||
-        t.peralatan.toLowerCase().includes(q) ||
-        t.petani.toLowerCase().includes(q)
+        (t.id + '').toLowerCase().includes(q) ||
+        (t.peralatan || '').toLowerCase().includes(q) ||
+        (t.petani?.nama || t.petani || '').toLowerCase().includes(q)
     );
   }, [myTagihan, searchQuery]);
 
-  const totalTagihan = myTagihan.reduce((s, t) => s + t.jumlah, 0);
-  const belumBayar = myTagihan.filter((t) => t.status === 'belum_bayar').reduce((s, t) => s + t.jumlah, 0);
-  const menungguVerifikasi = myTagihan.filter((t) => t.status === 'menunggu_verifikasi').reduce((s, t) => s + t.jumlah, 0);
-  const lunas = myTagihan.filter((t) => t.status === 'lunas').reduce((s, t) => s + t.jumlah, 0);
+  const totalTagihan = myTagihan.reduce((s, t) => s + (t.jumlah || 0), 0);
+  const belumBayar = myTagihan.filter((t) => t.status === 'belum_bayar').reduce((s, t) => s + (t.jumlah || 0), 0);
+  const menungguVerifikasi = myTagihan.filter((t) => t.status === 'menunggu_verifikasi').reduce((s, t) => s + (t.jumlah || 0), 0);
+  const lunas = myTagihan.filter((t) => t.status === 'lunas').reduce((s, t) => s + (t.jumlah || 0), 0);
 
   const hariIni = new Date().toISOString().slice(0, 10);
   const pembayaranMasukHariIni = myTagihan
-    .filter((t) => t.tanggalBayar === hariIni && t.status === 'lunas')
-    .reduce((s, t) => s + t.jumlah, 0);
+    .filter((t) => t.tanggal_bayar === hariIni && t.status === 'lunas')
+    .reduce((s, t) => s + (t.jumlah || 0), 0);
   const tagihanTertunggak = myTagihan
-    .filter((t) => t.status === 'belum_bayar' && new Date(t.jatuhTempo) < new Date())
-    .reduce((s, t) => s + t.jumlah, 0);
+    .filter((t) => t.status === 'belum_bayar' && new Date(t.jatuh_tempo) < new Date())
+    .reduce((s, t) => s + (t.jumlah || 0), 0);
 
   /* ── tabs ── */
   const tabs = [
@@ -131,38 +140,43 @@ export default function Pembayaran() {
     setActiveTab('upload');
   };
 
-  const handleUploadSubmit = (e) => {
+  const handleUploadSubmit = async (e) => {
     e.preventDefault();
     if (!selectedTagihan || !uploadFile) return;
-    setTagihan((prev) =>
-      prev.map((t) =>
-        t.id === selectedTagihan
-          ? { ...t, status: 'menunggu_verifikasi', tanggalBayar: uploadDate || hariIni, buktiPembayaran: uploadFile.name }
-          : t
-      )
-    );
-    setUploadSuccess(true);
-    setTimeout(() => {
-      setUploadSuccess(false);
-      setSelectedTagihan('');
-      setUploadFile(null);
-      setUploadAmount('');
-      setUploadDate('');
-      setUploadNotes('');
-      setActiveTab('tagihan');
-    }, 2500);
+    try {
+      const formData = new FormData();
+      formData.append('bukti_file', uploadFile);
+      formData.append('jumlah_dibayar', uploadAmount);
+      formData.append('tanggal_bayar', uploadDate || hariIni);
+      if (uploadNotes) formData.append('catatan', uploadNotes);
+      await uploadBukti(selectedTagihan, formData);
+      toast.success('Bukti pembayaran berhasil diupload!');
+      setUploadSuccess(true);
+      setTimeout(() => {
+        setUploadSuccess(false);
+        setSelectedTagihan('');
+        setUploadFile(null);
+        setUploadAmount('');
+        setUploadDate('');
+        setUploadNotes('');
+        setActiveTab('tagihan');
+        fetchTagihan();
+      }, 2000);
+    } catch (err) {
+      toast.error(err.message || 'Gagal upload bukti pembayaran');
+    }
   };
 
-  const handleVerifikasi = (id, approved) => {
-    setTagihan((prev) =>
-      prev.map((t) =>
-        t.id === id
-          ? { ...t, status: approved ? 'lunas' : 'belum_bayar', buktiPembayaran: approved ? t.buktiPembayaran : null, tanggalBayar: approved ? t.tanggalBayar : null }
-          : t
-      )
-    );
-    setVerifikasiModal(null);
-    setVerifikasiAction(null);
+  const handleVerifikasi = async (id, approved) => {
+    try {
+      await verifikasiTagihan(id, { aksi: approved ? 'setujui' : 'tolak' });
+      toast.success(approved ? 'Pembayaran disetujui' : 'Pembayaran ditolak');
+      fetchTagihan();
+      setVerifikasiModal(null);
+      setVerifikasiAction(null);
+    } catch (err) {
+      toast.error(err.message || 'Gagal memproses verifikasi');
+    }
   };
 
   const onDrop = (e) => {

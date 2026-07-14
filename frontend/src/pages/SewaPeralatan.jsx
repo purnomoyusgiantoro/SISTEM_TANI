@@ -6,18 +6,33 @@ import sewaApi from '../api/sewa';
 import masterApi from '../api/master';
 import { useApi, useMutation } from '../hooks/useApi';
 import { formatRupiah, formatTanggal } from '../utils/formatters';
-import * as Mock from '../data/mockData';
 import StatusBadge from '../components/shared/StatusBadge';
 import Modal from '../components/shared/Modal';
 import { Info, Plus, Calendar, ShieldCheck, HelpCircle, Sprout, Wrench, Wind, Droplet, Hammer, Cpu } from 'lucide-react';
 import '../styles/pages/SewaPeralatan.css';
 
+const KATEGORI_PERALATAN = ['Pengolah Tanah', 'Penyemprotan', 'Panen', 'Irigasi', 'Perawatan', 'Teknologi'];
 
 export default function SewaPeralatan() {
   const { currentUser } = useAuth();
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState('katalog');
-  const [peralatanList, setPeralatanList] = useState(Mock.peralatan);
-  const [sewaList, setSewaList] = useState(Mock.dataSewa);
+
+  // API hooks
+  const { data: peralatanData, loading: loadingPeralatan, execute: fetchPeralatan } = useApi(peralatanApi.getAll);
+  const { data: sewaData, loading: loadingSewa, execute: fetchSewa } = useApi(sewaApi.getAll);
+  const { mutate: createSewa, loading: creatingSewa } = useMutation(sewaApi.create);
+  const { mutate: setujuiSewa } = useMutation(sewaApi.setujui);
+  const { mutate: tolakSewa } = useMutation(sewaApi.tolak);
+  const { mutate: createPeralatan, loading: creatingPeralatan } = useMutation(peralatanApi.create);
+
+  useEffect(() => {
+    fetchPeralatan().catch(() => {});
+    fetchSewa().catch(() => {});
+  }, [fetchPeralatan, fetchSewa]);
+
+  const peralatanList = Array.isArray(peralatanData) ? peralatanData : [];
+  const sewaList = Array.isArray(sewaData) ? sewaData : [];
 
   const renderAlatIcon = (code) => {
     const style = { width: '40px', height: '40px' };
@@ -59,7 +74,7 @@ export default function SewaPeralatan() {
   // Add Item State (Pengurus)
   const [showAddModal, setShowAddModal] = useState(false);
   const [newItemName, setNewItemName] = useState('');
-  const [newItemKategori, setNewItemKategori] = useState(Mock.kategoriPeralatan[0]);
+  const [newItemKategori, setNewItemKategori] = useState(KATEGORI_PERALATAN[0]);
   const [newItemHarga, setNewItemHarga] = useState('');
   const [newItemStok, setNewItemStok] = useState('');
   const [newItemDeskripsi, setNewItemDeskripsi] = useState('');
@@ -84,94 +99,75 @@ export default function SewaPeralatan() {
     return matchKategori && matchSearch;
   });
 
-  // Filtered Rental History
-  const filteredSewa = sewaList.filter((sewa) => {
-    if (currentUser.role === 'petani') {
-      return sewa.petaniId === currentUser.id;
-    }
-    return true; // Pengurus sees all
-  });
+  // Filtered Rental History (backend already filters by role)
+  const filteredSewa = sewaList;
 
   // Handle Rental Request Submit
-  const handleRentSubmit = (e) => {
+  const handleRentSubmit = async (e) => {
     e.preventDefault();
     if (duration <= 0) {
-      alert('Tanggal selesai harus setelah tanggal mulai!');
+      toast.error('Tanggal selesai harus setelah tanggal mulai!');
       return;
     }
-
-    const newSewa = {
-      id: `SW-2026-${String(sewaList.length + 1).padStart(3, '0')}`,
-      petaniId: currentUser.id,
-      petani: currentUser.nama,
-      peralatanId: selectedAlat.id,
-      peralatan: selectedAlat.nama,
-      tanggalMulai,
-      tanggalSelesai,
-      durasi: duration,
-      totalBiaya,
-      status: 'menunggu',
-      validasi: 'pending',
-      validasiOleh: null
-    };
-
-    // Update state
-    setSewaList([newSewa, ...sewaList]);
-    
-    // Decrement available equipment count
-    setPeralatanList(prev => prev.map(p => {
-      if (p.id === selectedAlat.id) {
-        return { ...p, tersedia: Math.max(0, p.tersedia - 1) };
-      }
-      return p;
-    }));
-
-    // Reset Form
-    setShowRentModal(false);
-    setTanggalMulai('');
-    setTanggalSelesai('');
-    setCatatan('');
-    setActiveTab('riwayat');
+    try {
+      await createSewa({
+        peralatan_id: selectedAlat.id,
+        tanggal_mulai: tanggalMulai,
+        tanggal_selesai: tanggalSelesai,
+        catatan: catatan || null,
+      });
+      toast.success('Pengajuan sewa berhasil dikirim!');
+      fetchSewa();
+      fetchPeralatan();
+      setShowRentModal(false);
+      setTanggalMulai('');
+      setTanggalSelesai('');
+      setCatatan('');
+      setActiveTab('riwayat');
+    } catch (err) {
+      toast.error(err.message || 'Gagal mengajukan sewa');
+    }
   };
 
   // Handle Approve/Reject Rental (Pengurus)
-  const handleValidation = (sewaId, approved) => {
-    setSewaList(prev => prev.map(s => {
-      if (s.id === sewaId) {
-        return { 
-          ...s, 
-          validasi: approved ? 'disetujui' : 'ditolak',
-          status: approved ? 'aktif' : 'selesai',
-          validasiOleh: currentUser.nama 
-        };
+  const handleValidation = async (sewaId, approved) => {
+    try {
+      if (approved) {
+        await setujuiSewa(sewaId);
+        toast.success('Sewa berhasil disetujui');
+      } else {
+        await tolakSewa(sewaId, { alasan: 'Ditolak oleh pengurus' });
+        toast.success('Sewa berhasil ditolak');
       }
-      return s;
-    }));
+      fetchSewa();
+      fetchPeralatan();
+    } catch (err) {
+      toast.error(err.message || 'Gagal memproses validasi');
+    }
   };
 
   // Add Equipment Submit (Pengurus)
-  const handleAddEquipment = (e) => {
+  const handleAddEquipment = async (e) => {
     e.preventDefault();
-    const newAlat = {
-      id: peralatanList.length + 1,
-      nama: newItemName,
-      kategori: newItemKategori,
-      deskripsi: newItemDeskripsi,
-      hargaPerHari: Number(newItemHarga),
-      stok: Number(newItemStok),
-      tersedia: Number(newItemStok),
-      gambar: '⚙️',
-      kondisi: 'Baik'
-    };
-
-    setPeralatanList([...peralatanList, newAlat]);
-    setShowAddModal(false);
-    
-    // Reset Form
-    setNewItemName('');
-    setNewItemHarga('');
-    setNewItemStok('');
-    setNewItemDeskripsi('');
+    try {
+      const formData = new FormData();
+      formData.append('nama', newItemName);
+      formData.append('kategori', newItemKategori);
+      formData.append('deskripsi', newItemDeskripsi);
+      formData.append('harga_per_hari', Number(newItemHarga));
+      formData.append('stok', Number(newItemStok));
+      formData.append('kondisi', 'Baik');
+      await createPeralatan(formData);
+      toast.success('Peralatan berhasil ditambahkan!');
+      fetchPeralatan();
+      setShowAddModal(false);
+      setNewItemName('');
+      setNewItemHarga('');
+      setNewItemStok('');
+      setNewItemDeskripsi('');
+    } catch (err) {
+      toast.error(err.message || 'Gagal menambahkan peralatan');
+    }
   };
 
   return (
@@ -223,7 +219,7 @@ export default function SewaPeralatan() {
                 className="filter-select"
                 style={{ width: '100%' }}
               >
-                {Mock.kategoriPeralatan.map(kat => (
+                {KATEGORI_PERALATAN.map(kat => (
                   <option key={kat} value={kat}>{kat}</option>
                 ))}
               </select>
@@ -341,11 +337,11 @@ export default function SewaPeralatan() {
                 filteredSewa.map((sewa) => (
                   <tr key={sewa.id} style={{ borderBottom: '1px solid var(--color-border-light)', fontSize: '0.875rem' }}>
                     <td style={{ padding: '12px', fontWeight: '600' }}>{sewa.id}</td>
-                    {currentUser.role === 'pengurus' && <td style={{ padding: '12px' }}>{sewa.petani}</td>}
-                    <td style={{ padding: '12px', fontWeight: '600' }}>{sewa.peralatan}</td>
-                    <td style={{ padding: '12px' }}>{formatTanggal(sewa.tanggalMulai)}</td>
-                    <td style={{ padding: '12px' }}>{formatTanggal(sewa.tanggalSelesai)}</td>
-                    <td style={{ padding: '12px', fontWeight: '700' }}>{formatRupiah(sewa.totalBiaya)}</td>
+                    {currentUser.role === 'pengurus' && <td style={{ padding: '12px' }}>{sewa.petani?.nama || sewa.petani || '-'}</td>}
+                    <td style={{ padding: '12px', fontWeight: '600' }}>{sewa.peralatan?.nama || sewa.peralatan || '-'}</td>
+                    <td style={{ padding: '12px' }}>{formatTanggal(sewa.tanggal_mulai || sewa.tanggalMulai)}</td>
+                    <td style={{ padding: '12px' }}>{formatTanggal(sewa.tanggal_selesai || sewa.tanggalSelesai)}</td>
+                    <td style={{ padding: '12px', fontWeight: '700' }}>{formatRupiah(sewa.total_biaya || sewa.totalBiaya)}</td>
                     <td style={{ padding: '12px' }}>
                       <span style={{ 
                         fontSize: '0.75rem', 
@@ -380,7 +376,7 @@ export default function SewaPeralatan() {
                             </button>
                           </div>
                         ) : (
-                          <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Oleh {sewa.validasiOleh}</span>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Oleh {sewa.validasi_oleh || sewa.validasiOleh || '-'}</span>
                         )}
                       </td>
                     )}

@@ -6,7 +6,6 @@ import lahanApi from '../api/lahan';
 import masterApi from '../api/master';
 import { useApi, useMutation } from '../hooks/useApi';
 import { formatTanggal } from '../utils/formatters';
-import * as Mock from '../data/mockData';
 import '../styles/pages/Kegiatan.css';
 
 import {
@@ -14,9 +13,19 @@ import {
   Camera, FileText, Clock, Sprout, Droplet, Wind, Wheat, Hammer, Wrench, MapPin
 } from 'lucide-react';
 
+const JENIS_KEGIATAN = [
+  { value: 'tanam', label: 'Penanaman', icon: 'tanam', color: '#10b981' },
+  { value: 'pemupukan', label: 'Pemupukan', icon: 'pupuk', color: '#8b5cf6' },
+  { value: 'penyemprotan', label: 'Penyemprotan', icon: 'semprot', color: '#f59e0b' },
+  { value: 'panen', label: 'Panen', icon: 'panen', color: '#ef4444' },
+  { value: 'pengolahan', label: 'Pengolahan Tanah', icon: 'olah', color: '#6366f1' },
+  { value: 'irigasi', label: 'Irigasi', icon: 'irigasi', color: '#0ea5e9' },
+  { value: 'perawatan', label: 'Perawatan', icon: 'rawat', color: '#14b8a6' },
+];
+
 /* ── helpers ── */
 function getJenisConfig(value) {
-  return Mock.jenisKegiatan.find((j) => j.value === value) || { label: value, icon: 'kegiatan', color: '#6b7280' };
+  return JENIS_KEGIATAN.find((j) => j.value === value) || { label: value, icon: 'kegiatan', color: '#6b7280' };
 }
 
 function renderKegiatanIcon(code, size = 18) {
@@ -128,7 +137,21 @@ export default function Kegiatan() {
   const role = currentUser?.role || 'petani';
   const canAdd = role === 'petani' || role === 'pengurus';
 
-  const [kegiatan, setKegiatan] = useState(Mock.dataKegiatan);
+  const toast = useToast();
+  const [activeTab, setActiveTab] = useState('kegiatan');
+
+  // API hooks
+  const { data: kegiatanData, loading: loadingKegiatan, execute: fetchKegiatan } = useApi(kegiatanApi.getAll);
+  const { data: lahanData, execute: fetchLahan } = useApi(lahanApi.getAll);
+  const { mutate: createKegiatan, loading: creatingKegiatan } = useMutation(kegiatanApi.create);
+
+  useEffect(() => {
+    fetchKegiatan().catch(() => {});
+    fetchLahan().catch(() => {});
+  }, [fetchKegiatan, fetchLahan]);
+
+  const kegiatan = Array.isArray(kegiatanData) ? kegiatanData : [];
+
   const [showModal, setShowModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterJenis, setFilterJenis] = useState('');
@@ -163,32 +186,35 @@ export default function Kegiatan() {
 
   /* userLahan */
   const userLahan = useMemo(() => {
-    if (role === 'petani') return Mock.dataLahan.filter((l) => l.pemilikId === currentUser?.id);
-    return Mock.dataLahan;
-  }, [role, currentUser]);
+    const lahanList = Array.isArray(lahanData) ? lahanData : [];
+    if (role === 'petani') return lahanList.filter((l) => l.pemilik_id === currentUser?.id || l.pemilikId === currentUser?.id);
+    return lahanList;
+  }, [role, currentUser, lahanData]);
 
   /* ── submit ── */
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const lahan = Mock.dataLahan.find((l) => l.id === Number(formLahan));
-    const newItem = {
-      id: kegiatan.length + 1,
-      petaniId: currentUser?.id || 1,
-      petani: currentUser?.nama || 'Pengguna',
-      lahanId: Number(formLahan),
-      lokasi: lahan ? lahan.lokasi.split(',')[0] : '',
-      jenis: formJenis,
-      deskripsi: formDeskripsi,
-      tanggal: formTanggal,
-      foto: formFoto ? formFoto.name : null,
-    };
-    setKegiatan((prev) => [newItem, ...prev]);
-    setShowModal(false);
-    setFormTanggal('');
-    setFormJenis('');
-    setFormLahan('');
-    setFormDeskripsi('');
-    setFormFoto(null);
+    try {
+      const formData = new FormData();
+      formData.append('lahan_id', formLahan);
+      formData.append('jenis', formJenis);
+      formData.append('deskripsi', formDeskripsi);
+      formData.append('tanggal', formTanggal);
+      if (formFoto) formData.append('foto_file', formFoto);
+
+      await createKegiatan(formData);
+      toast.success('Kegiatan berhasil ditambahkan');
+      fetchKegiatan();
+      
+      setShowModal(false);
+      setFormTanggal('');
+      setFormJenis('');
+      setFormLahan('');
+      setFormDeskripsi('');
+      setFormFoto(null);
+    } catch (err) {
+      toast.error(err.message || 'Gagal menambahkan kegiatan');
+    }
   };
 
   /* ══════════════ RENDER ══════════════ */
@@ -263,7 +289,7 @@ export default function Kegiatan() {
                 style={{ width: '100%' }}
               >
                 <option value="">Semua Jenis</option>
-                {Mock.jenisKegiatan.map((j) => (
+                {JENIS_KEGIATAN.map((j) => (
                   <option key={j.value} value={j.value}>{j.label}</option>
                 ))}
               </select>
@@ -352,7 +378,7 @@ export default function Kegiatan() {
               <label>Jenis Kegiatan</label>
               <select value={formJenis} onChange={(e) => setFormJenis(e.target.value)} required>
                 <option value="">-- Pilih jenis kegiatan --</option>
-                {Mock.jenisKegiatan.map((j) => (
+                {JENIS_KEGIATAN.map((j) => (
                   <option key={j.value} value={j.value}>{j.label}</option>
                 ))}
               </select>

@@ -4,7 +4,6 @@ import { useToast } from '../context/ToastContext';
 import verifikasiLahanApi from '../api/verifikasiLahan';
 import { useApi, useMutation } from '../hooks/useApi';
 import { formatTanggal } from '../utils/formatters';
-import * as Mock from '../data/mockData';
 import StatusBadge from '../components/shared/StatusBadge';
 import Modal from '../components/shared/Modal';
 import '../styles/pages/VerifikasiLahan.css';
@@ -28,21 +27,34 @@ export default function VerifikasiLahan() {
   const [keputusan, setKeputusan] = useState('');
   const [catatanVerifikasi, setCatatanVerifikasi] = useState('');
   const [alasanPenolakan, setAlasanPenolakan] = useState('');
-  const [lahanList, setLahanList] = useState(Mock.dataLahan);
+
+  // API hooks
+  const { data: lahanData, loading: loadingLahan, execute: fetchLahan } = useApi(verifikasiLahanApi.getAll);
+  const { mutate: terimaLahan } = useMutation(verifikasiLahanApi.terima);
+  const { mutate: tolakLahan } = useMutation(verifikasiLahanApi.tolak);
+
+  useEffect(() => {
+    fetchLahan().catch(() => {});
+  }, [fetchLahan]);
+
+  const lahanList = Array.isArray(lahanData) ? lahanData : [];
 
   const counts = useMemo(() => ({
-    pending: lahanList.filter(l => l.statusVerifikasi === 'pending').length,
-    terverifikasi: lahanList.filter(l => l.statusVerifikasi === 'terverifikasi').length,
-    ditolak: lahanList.filter(l => l.statusVerifikasi === 'ditolak').length,
+    pending: lahanList.filter(l => l.status_verifikasi === 'pending' || l.statusVerifikasi === 'pending').length,
+    terverifikasi: lahanList.filter(l => l.status_verifikasi === 'terverifikasi' || l.statusVerifikasi === 'terverifikasi').length,
+    ditolak: lahanList.filter(l => l.status_verifikasi === 'ditolak' || l.statusVerifikasi === 'ditolak').length,
   }), [lahanList]);
 
   const filteredLahan = useMemo(() => {
     return lahanList.filter(l => {
-      if (l.statusVerifikasi !== activeTab) return false;
+      const status = l.status_verifikasi || l.statusVerifikasi;
+      const tgl = l.tanggal_daftar || l.tanggalDaftar;
+      const jenis = l.jenis_lahan || l.jenisLahan;
+      if (status !== activeTab) return false;
       if (filterWilayah && !l.lokasi.includes(filterWilayah)) return false;
-      if (filterJenis && l.jenisLahan !== filterJenis) return false;
-      if (filterDateFrom && l.tanggalDaftar < filterDateFrom) return false;
-      if (filterDateTo && l.tanggalDaftar > filterDateTo) return false;
+      if (filterJenis && jenis !== filterJenis) return false;
+      if (filterDateFrom && tgl < filterDateFrom) return false;
+      if (filterDateTo && tgl > filterDateTo) return false;
       return true;
     });
   }, [lahanList, activeTab, filterWilayah, filterJenis, filterDateFrom, filterDateTo]);
@@ -55,20 +67,21 @@ export default function VerifikasiLahan() {
     setModalOpen(true);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedLahan || !keputusan) return;
-    setLahanList(prev => prev.map(l => {
-      if (l.id === selectedLahan.id) {
-        return {
-          ...l,
-          statusVerifikasi: keputusan === 'setuju' ? 'terverifikasi' : 'ditolak',
-          verifikator: currentUser?.nama || 'Ir. Hendra Wijaya',
-          catatan: keputusan === 'tolak' ? alasanPenolakan : (catatanVerifikasi || l.catatan),
-        };
+    try {
+      if (keputusan === 'setuju') {
+        await terimaLahan(selectedLahan.id, { catatan: catatanVerifikasi });
+        toast.success('Lahan berhasil diverifikasi');
+      } else {
+        await tolakLahan(selectedLahan.id, { catatan: alasanPenolakan });
+        toast.success('Lahan berhasil ditolak');
       }
-      return l;
-    }));
-    setModalOpen(false);
+      fetchLahan();
+      setModalOpen(false);
+    } catch (err) {
+      toast.error(err.message || 'Gagal memproses verifikasi lahan');
+    }
   };
 
   const tabs = [

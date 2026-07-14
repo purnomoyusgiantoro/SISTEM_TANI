@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import * as Mock from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import organisasiApi from '../api/organisasi';
@@ -11,7 +10,17 @@ import '../styles/pages/StrukturOrganisasi.css';
 
 export default function StrukturOrganisasi() {
   const { currentUser } = useAuth();
-  const [treeData, setTreeData] = useState(Mock.strukturOrganisasi);
+  const toast = useToast();
+
+  const { data: orgData, loading, execute: fetchOrg } = useApi(organisasiApi.getAll);
+  const { mutate: updateOrg } = useMutation(organisasiApi.update);
+
+  useEffect(() => {
+    fetchOrg().catch(() => {});
+  }, [fetchOrg]);
+
+  const treeData = orgData || null;
+
   const [selectedNode, setSelectedNode] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -72,14 +81,17 @@ export default function StrukturOrganisasi() {
     return rootNode;
   };
 
-  const handleSaveNode = (e) => {
+  const handleSaveNode = async (e) => {
     e.preventDefault();
-    const updated = updateNodeInTree(treeData, selectedNode.id, {
-      nama: editName,
-      jabatan: editJabatan
-    });
-    setTreeData(updated);
-    setSelectedNode(null);
+    if (!selectedNode) return;
+    try {
+      await updateOrg(selectedNode.id, { nama: editName, jabatan: editJabatan });
+      toast.success('Data organisasi berhasil diperbarui');
+      fetchOrg();
+      setSelectedNode(null);
+    } catch (err) {
+      toast.error(err.message || 'Gagal memperbarui organisasi');
+    }
   };
 
   return (

@@ -3,7 +3,6 @@ import { useToast } from '../context/ToastContext';
 import beritaApi from '../api/berita';
 import { useApi, useMutation } from '../hooks/useApi';
 import { formatTanggal } from '../utils/formatters';
-import * as Mock from '../data/mockData';
 import { Plus, Edit, Trash2, Globe, EyeOff } from 'lucide-react';
 import StatusBadge from '../components/shared/StatusBadge';
 import Modal from '../components/shared/Modal';
@@ -11,7 +10,20 @@ import '../styles/pages/KelolaBerita.css';
 
 
 export default function KelolaBerita() {
-  const [beritaList, setBeritaList] = useState(Mock.dataBerita);
+  const toast = useToast();
+  
+  // API hooks
+  const { data: beritaData, loading: loadingBerita, execute: fetchBerita } = useApi(beritaApi.getAll);
+  const { mutate: createBerita, loading: creatingBerita } = useMutation(beritaApi.create);
+  const { mutate: updateBerita, loading: updatingBerita } = useMutation(beritaApi.update);
+  const { mutate: deleteBerita, loading: deletingBerita } = useMutation(beritaApi.delete);
+
+  useEffect(() => {
+    fetchBerita().catch(() => {});
+  }, [fetchBerita]);
+
+  const beritaList = Array.isArray(beritaData) ? beritaData : [];
+
   const [selectedBerita, setSelectedBerita] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(null);
@@ -22,43 +34,41 @@ export default function KelolaBerita() {
   const [isi, setIsi] = useState('');
   const [status, setStatus] = useState('published');
 
-  const handleCreate = (e) => {
+  const handleCreate = async (e) => {
     e.preventDefault();
-    const newBerita = {
-      id: beritaList.length + 1,
-      judul,
-      kategori,
-      isi,
-      status,
-      penulis: 'Ir. Hendra Wijaya (BPP)',
-      tanggal: new Date().toISOString().split('T')[0]
-    };
-    setBeritaList([newBerita, ...beritaList]);
-    setShowAddModal(false);
-    resetForm();
+    try {
+      await createBerita({ judul, kategori, isi, status });
+      toast.success('Berita berhasil ditambahkan');
+      fetchBerita();
+      setShowAddModal(false);
+      resetForm();
+    } catch (err) {
+      toast.error(err.message || 'Gagal menambahkan berita');
+    }
   };
 
-  const handleEdit = (e) => {
+  const handleEdit = async (e) => {
     e.preventDefault();
-    setBeritaList(prev => prev.map(b => {
-      if (b.id === selectedBerita.id) {
-        return {
-          ...b,
-          judul,
-          kategori,
-          isi,
-          status
-        };
-      }
-      return b;
-    }));
-    setSelectedBerita(null);
-    resetForm();
+    try {
+      await updateBerita(selectedBerita.id, { judul, kategori, isi, status });
+      toast.success('Berita berhasil diperbarui');
+      fetchBerita();
+      setSelectedBerita(null);
+      resetForm();
+    } catch (err) {
+      toast.error(err.message || 'Gagal memperbarui berita');
+    }
   };
 
-  const handleDelete = () => {
-    setBeritaList(prev => prev.filter(b => b.id !== showDeleteModal.id));
-    setShowDeleteModal(null);
+  const handleDelete = async () => {
+    try {
+      await deleteBerita(showDeleteModal.id);
+      toast.success('Berita berhasil dihapus');
+      fetchBerita();
+      setShowDeleteModal(null);
+    } catch (err) {
+      toast.error(err.message || 'Gagal menghapus berita');
+    }
   };
 
   const resetForm = () => {

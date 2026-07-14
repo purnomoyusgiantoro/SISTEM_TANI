@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import * as Mock from '../data/mockData';
 import { useToast } from '../context/ToastContext';
 import backupApi from '../api/backup';
 import { useApi, useMutation } from '../hooks/useApi';
@@ -9,41 +8,54 @@ import '../styles/pages/BackupData.css';
 
 
 export default function BackupData() {
-  const [backups, setBackups] = useState([
-    { id: 1, nama: 'backup_db_simantan_auto_20260620.sql', ukuran: '245 MB', tanggal: '2026-06-20 06:00', tipe: 'Otomatis', status: 'sukses' },
-    { id: 2, nama: 'backup_db_simantan_manual_20260618.sql', ukuran: '242 MB', tanggal: '2026-06-18 14:30', tipe: 'Manual', status: 'sukses' },
-    { id: 3, nama: 'backup_db_simantan_auto_20260613.sql', ukuran: '238 MB', tanggal: '2026-06-13 06:00', tipe: 'Otomatis', status: 'sukses' },
-  ]);
+  const toast = useToast();
+
+  const { data: backupsData, loading: loadingBackups, execute: fetchBackups } = useApi(backupApi.getAll);
+  const { mutate: createBackup } = useMutation(backupApi.create);
+  const { mutate: restoreBackup } = useMutation(backupApi.restore);
+  const { mutate: deleteBackup } = useMutation(backupApi.delete);
+
+  useEffect(() => {
+    fetchBackups().catch(() => {});
+  }, [fetchBackups]);
+
+  const backups = Array.isArray(backupsData) ? backupsData : [];
 
   const [scheduleAuto, setScheduleAuto] = useState(true);
   const [scheduleFrequency, setScheduleFrequency] = useState('Harian');
   const [showRestoreModal, setShowRestoreModal] = useState(null);
 
-  const handleBackupNow = () => {
-    const newBackup = {
-      id: backups.length + 1,
-      nama: `backup_db_simantan_manual_${new Date().toISOString().slice(0,10).replace(/-/g,'')}.sql`,
-      ukuran: '246 MB',
-      tanggal: new Date().toISOString().replace('T',' ').slice(0,16),
-      tipe: 'Manual',
-      status: 'sukses'
-    };
-    
-    // Simulating delay
-    alert('Memulai proses pencadangan database...');
-    setBackups([newBackup, ...backups]);
-    alert('Pencadangan database berhasil disimpan!');
+  const handleBackupNow = async () => {
+    try {
+      toast.success('Memulai proses pencadangan database...');
+      await createBackup();
+      toast.success('Pencadangan database berhasil disimpan!');
+      fetchBackups();
+    } catch (err) {
+      toast.error(err.message || 'Gagal membuat backup');
+    }
   };
 
-  const handleRestore = (backup) => {
-    alert(`Memulihkan sistem dari cadangan file: ${backup.nama}`);
-    setShowRestoreModal(null);
-    alert('Sistem berhasil dipulihkan!');
+  const handleRestore = async (backup) => {
+    try {
+      toast.success(`Memulihkan sistem dari cadangan file: ${backup.nama}`);
+      await restoreBackup(backup.id);
+      toast.success('Sistem berhasil dipulihkan!');
+      setShowRestoreModal(null);
+    } catch (err) {
+      toast.error(err.message || 'Gagal memulihkan sistem');
+    }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Hapus file backup ini secara permanen?')) {
-      setBackups(prev => prev.filter(b => b.id !== id));
+      try {
+        await deleteBackup(id);
+        toast.success('Backup berhasil dihapus');
+        fetchBackups();
+      } catch (err) {
+        toast.error(err.message || 'Gagal menghapus backup');
+      }
     }
   };
 
