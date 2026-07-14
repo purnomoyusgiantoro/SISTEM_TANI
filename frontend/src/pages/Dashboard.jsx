@@ -62,8 +62,8 @@ export default function Dashboard() {
   // Render Dashboard based on role
   const renderPetaniDashboard = () => {
     // Land owned by current farmer
-    const myLahan = stats.lahan_terbaru || [];
-    const mySewa = stats.sewa_terbaru || [];
+    const myLahan = (stats.lahan_terbaru || []).filter(Boolean);
+    const mySewa = (stats.sewa_terbaru || []).filter(Boolean);
 
     return (
       <div className="dashboard-grid animate-fade-in-up">
@@ -157,7 +157,7 @@ export default function Dashboard() {
   };
 
   const renderPengurusDashboard = () => {
-    const pendingSewa = stats.pending_sewa || [];
+    const pendingSewa = (stats.pending_sewa || []).filter(Boolean);
     
     return (
       <div className="dashboard-grid animate-fade-in-up">
@@ -248,7 +248,7 @@ export default function Dashboard() {
   };
 
   const renderBPPDashboard = () => {
-    const pendingVerifikasi = stats.antrean_verifikasi || [];
+    const pendingVerifikasi = (stats.antrean_verifikasi || []).filter(Boolean);
     
     return (
       <div className="dashboard-grid animate-fade-in-up">
@@ -316,8 +316,8 @@ export default function Dashboard() {
                 Lihat Semua <ArrowRight size={14} />
               </button>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {(stats.log_terbaru || []).slice(0, 5).map(log => (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {(stats.log_aktivitas || []).filter(Boolean).slice(0, 5).map((log) => (
                 <div key={log.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-border-light)', paddingBottom: '8px', fontSize: '0.85rem' }}>
                   <div>
                     <span style={{ fontWeight: '600', color: 'var(--color-text)' }}>{log.user_name || log.user || '-'}</span>
