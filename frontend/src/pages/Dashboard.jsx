@@ -342,15 +342,7 @@ export default function Dashboard() {
       {loading && <LoadingSpinner message="Memuat dashboard..." />}
       {error && <div style={{ padding: '20px', textAlign: 'center', color: 'var(--color-danger)' }}>Gagal memuat data: {error.message}</div>}
       {/* Welcome Greeting Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
-        <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--color-primary-dark)' }}>
-            {getGreeting()}, {currentUser?.nama}!
-          </h1>
-          <p style={{ color: 'var(--color-text-secondary)', marginTop: '4px' }}>
-            Selamat datang kembali di Portal Pertanian Pemerintah Kota - Sistem Tani.
-          </p>
-        </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <button style={{ background: 'white', padding: '8px 16px', borderRadius: '24px', border: '1px solid var(--color-border)', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-primary)', boxShadow: 'var(--shadow-xs)', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
             <Download size={14} /> Unduh Laporan PDF

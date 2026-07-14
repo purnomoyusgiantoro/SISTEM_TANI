@@ -143,20 +143,7 @@ export default function Sidebar({ isOpen, onToggle }) {
         </div>
       </div>
 
-      {/* User Info (Moved to Top) */}
-      <div className="sidebar-user" style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
-        <div className="sidebar-user-avatar">
-          {getInitials(currentUser?.nama)}
-        </div>
-        <div className="sidebar-user-info">
-          <div className="sidebar-user-name">
-            {currentUser?.nama || 'Pengguna'}
-          </div>
-          <span className="sidebar-user-role">
-            {roleLabels[role] || role}
-          </span>
-        </div>
-      </div>
+
 
       {/* Navigation */}
       <nav className="sidebar-nav" style={{ padding: '0' }}>
@@ -168,17 +155,19 @@ export default function Sidebar({ isOpen, onToggle }) {
             const hasActiveChild = item.subItems.some(sub => isActive(sub.path));
             
             return (
-              <div key={`parent-${index}`} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <div key={`parent-${index}`}>
                 <div 
                   onClick={() => toggleSubMenu(item.label)}
                   style={{ 
                     display: 'flex', 
                     alignItems: 'center', 
-                    padding: '12px 20px', 
+                    padding: '10px 16px',
+                    margin: '4px 12px',
+                    borderRadius: '8px', 
                     color: 'rgba(255, 255, 255, 0.8)', 
                     cursor: 'pointer',
                     fontSize: '0.9rem',
-                    background: isExpanded || hasActiveChild ? 'rgba(0,0,0,0.2)' : 'transparent'
+                    background: isExpanded || hasActiveChild ? '#4a5568' : 'transparent'
                   }}
                 >
                   <Icon size={18} style={{ marginRight: '12px' }} />
@@ -186,7 +175,7 @@ export default function Sidebar({ isOpen, onToggle }) {
                   <ChevronLeft size={16} style={{ transform: isExpanded ? 'rotate(-90deg)' : 'none', transition: 'transform 0.2s', opacity: 0.5 }} />
                 </div>
                 {isExpanded && (
-                  <div style={{ background: 'rgba(0,0,0,0.1)', padding: '4px 0' }}>
+                  <div style={{ padding: '2px 0' }}>
                     {item.subItems.map((sub, subIdx) => (
                       <Link
                         key={`sub-${index}-${subIdx}`}
@@ -194,11 +183,13 @@ export default function Sidebar({ isOpen, onToggle }) {
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          padding: '8px 20px 8px 50px',
+                          padding: '8px 16px 8px 40px',
+                          margin: '2px 12px',
+                          borderRadius: '8px',
                           color: isActive(sub.path) ? 'var(--color-text-inverse)' : 'rgba(255,255,255,0.6)',
                           fontSize: '0.85rem',
                           textDecoration: 'none',
-                          background: isActive(sub.path) ? 'rgba(255,255,255,0.05)' : 'transparent'
+                          background: isActive(sub.path) ? '#4a5568' : 'transparent'
                         }}
                         onClick={() => {
                           if (window.innerWidth < 768 && onToggle) onToggle();
@@ -224,12 +215,13 @@ export default function Sidebar({ isOpen, onToggle }) {
               style={{
                 display: 'flex', 
                 alignItems: 'center', 
-                padding: '12px 20px', 
+                padding: '10px 16px',
+                margin: '4px 12px',
+                borderRadius: '8px', 
                 color: active ? 'var(--color-text-inverse)' : 'rgba(255, 255, 255, 0.8)', 
                 textDecoration: 'none',
                 fontSize: '0.9rem',
-                borderBottom: '1px solid rgba(255,255,255,0.05)',
-                background: active ? 'rgba(0,0,0,0.2)' : 'transparent'
+                background: active ? '#4a5568' : 'transparent'
               }}
               onClick={() => {
                 if (window.innerWidth < 768 && onToggle) {

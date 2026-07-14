@@ -21,8 +21,6 @@ export default function LandingPage() {
           </div>
         </div>
         <div className="nav-links">
-          <a href="#fitur" className="nav-link">Fitur Utama</a>
-          <a href="#layanan" className="nav-link">Layanan Kami</a>
           <button className="nav-btn" onClick={() => navigate('/login')}>
             Masuk Portal
           </button>
@@ -120,8 +118,6 @@ export default function LandingPage() {
           <div className="footer-col">
             <h3>Tautan Cepat</h3>
             <ul className="footer-links">
-              <li><a href="#fitur">Fitur Utama</a></li>
-              <li><a href="#layanan">Layanan BPP</a></li>
               <li><a href="/login">Portal Masuk</a></li>
               <li><a href="#">Bantuan & FAQ</a></li>
             </ul>
