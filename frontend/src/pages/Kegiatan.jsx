@@ -320,7 +320,7 @@ export default function Kegiatan() {
                           </span>
                           {role !== 'petani' && (
                             <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
-                              oleh <strong style={{ color: 'var(--color-text)' }}>{item.petani}</strong>
+                              oleh <strong style={{ color: 'var(--color-text)' }}>{typeof item.petani === 'object' ? (item.petani?.nama || '-') : (item.petani || '-')}</strong>
                             </div>
                           )}
                         </div>

@@ -135,8 +135,10 @@ export default function LogAktivitas() {
                     <td style={{ padding: '12px 16px', color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>
                       {log.waktu}
                     </td>
-                    <td style={{ padding: '12px 16px', fontWeight: '600' }}>
-                      {log.user}
+                    <td style={{ padding: '12px 16px' }}>
+                      <div style={{ fontWeight: 600 }}>
+                        {typeof log.user === 'object' ? (log.user?.nama || '-') : (log.user || '-')}
+                      </div>
                     </td>
                     <td style={{ padding: '12px 16px' }}>
                       <span style={{ 

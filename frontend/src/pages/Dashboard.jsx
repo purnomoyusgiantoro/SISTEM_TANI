@@ -133,7 +133,7 @@ export default function Dashboard() {
                     {mySewa.length > 0 ? (
                       mySewa.slice(0, 3).map((s) => (
                         <tr key={s.id} style={{ borderBottom: '1px solid var(--color-border-light)', fontSize: '0.85rem' }}>
-                          <td style={{ padding: '12px 16px', fontWeight: '600' }}>{s.peralatan?.nama || s.peralatan || '-'}</td>
+                          <td style={{ padding: '12px 16px', fontWeight: '600' }}>{typeof s.peralatan === 'object' ? (s.peralatan?.nama || '-') : (s.peralatan || '-')}</td>
                           <td style={{ padding: '12px 16px' }}>{s.tanggalMulai || s.tanggal_mulai}</td>
                           <td style={{ padding: '12px 16px' }}>{formatRupiah(s.totalBiaya || s.total_biaya)}</td>
                           <td style={{ padding: '12px 16px' }}>
@@ -187,8 +187,8 @@ export default function Dashboard() {
                     {pendingSewa.length > 0 ? (
                       pendingSewa.slice(0, 3).map((s) => (
                         <tr key={s.id} style={{ borderBottom: '1px solid var(--color-border-light)', fontSize: '0.85rem' }}>
-                          <td style={{ padding: '12px 16px' }}>{s.petani?.nama || s.petani || '-'}</td>
-                          <td style={{ padding: '12px 16px', fontWeight: '600' }}>{s.peralatan?.nama || s.peralatan || '-'}</td>
+                          <td style={{ padding: '12px 16px' }}>{typeof s.petani === 'object' ? (s.petani?.nama || '-') : (s.petani || '-')}</td>
+                          <td style={{ padding: '12px 16px', fontWeight: '600' }}>{typeof s.peralatan === 'object' ? (s.peralatan?.nama || '-') : (s.peralatan || '-')}</td>
                           <td style={{ padding: '12px 16px' }}>{s.durasi_hari || s.durasi} Hari</td>
                           <td style={{ padding: '12px 16px' }}>{formatRupiah(s.totalBiaya || s.total_biaya)}</td>
                           <td style={{ padding: '12px 16px' }}>
@@ -278,7 +278,7 @@ export default function Dashboard() {
                     {pendingVerifikasi.length > 0 ? (
                       pendingVerifikasi.slice(0, 3).map((l) => (
                         <tr key={l.id} style={{ borderBottom: '1px solid var(--color-border-light)', fontSize: '0.85rem' }}>
-                          <td style={{ padding: '12px 16px' }}>{l.pemilik?.nama || l.pemilik || '-'}</td>
+                          <td style={{ padding: '12px 16px' }}>{typeof l.pemilik === 'object' ? (l.pemilik?.nama || '-') : (l.pemilik || '-')}</td>
                           <td style={{ padding: '12px 16px' }}>{l.lokasi}</td>
                           <td style={{ padding: '12px 16px' }}>{l.luas} Ha</td>
                           <td style={{ padding: '12px 16px' }}>

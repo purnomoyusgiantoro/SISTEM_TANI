@@ -155,7 +155,7 @@ export default function VerifikasiLahan() {
               <tbody>
                 {filteredLahan.map((lahan) => (
                   <tr key={lahan.id}>
-                    <td style={{ fontWeight: 600 }}>{lahan.pemilik}</td>
+                    <td style={{ fontWeight: 600 }}>{typeof lahan.pemilik === 'object' ? (lahan.pemilik?.nama || '-') : (lahan.pemilik || '-')}</td>
                     <td>{lahan.lokasi}</td>
                     <td style={{ fontWeight: 600 }}>{lahan.luas} Ha</td>
                     <td>{lahan.jenisLahan}</td>
@@ -181,8 +181,8 @@ export default function VerifikasiLahan() {
                         </div>
                       )}
                       {lahan.statusVerifikasi === 'terverifikasi' && (
-                        <div style={{ fontSize: '12px', color: '#059669' }}>
-                          {lahan.verifikator}
+                        <div style={{ fontWeight: 600, color: 'var(--color-text)' }}>
+                          {typeof lahan.verifikator === 'object' ? (lahan.verifikator?.nama || '-') : (lahan.verifikator || '-')}
                         </div>
                       )}
                       {lahan.statusVerifikasi === 'ditolak' && (

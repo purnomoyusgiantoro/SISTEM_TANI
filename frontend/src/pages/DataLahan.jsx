@@ -298,7 +298,7 @@ export default function DataLahan() {
                     </td>
                     <td>
                       <div className="lahan-cell-pemilik">
-                        <span>{lahan.pemilik?.nama || lahan.pemilik || '-'}</span>
+                        <span>{typeof lahan.pemilik === 'object' ? (lahan.pemilik?.nama || '-') : (lahan.pemilik || '-')}</span>
                       </div>
                     </td>
                     <td>
@@ -518,7 +518,7 @@ export default function DataLahan() {
               <div className="lahan-detail-card">
                 <div className="lahan-detail-header">
                   <div className="lahan-detail-header-info">
-                    <h3 className="lahan-detail-name">{detailLahan.pemilik?.nama || detailLahan.pemilik || '-'}</h3>
+                    <h3 className="lahan-detail-name">{typeof detailLahan.pemilik === 'object' ? (detailLahan.pemilik?.nama || '-') : (detailLahan.pemilik || '-')}</h3>
                     <p className="lahan-detail-loc">
                       <MapPin size={13} />
                       {detailLahan.lokasi}
@@ -598,7 +598,7 @@ export default function DataLahan() {
                         <div className="lahan-timeline-content">
                           <p className="lahan-timeline-action">{item.aksi}</p>
                           <span className="lahan-timeline-meta">
-                            {formatTanggal(item.tanggal)} — {item.user}
+                            {formatTanggal(item.tanggal)} — {typeof item.user === 'object' ? (item.user?.nama || '-') : (item.user || '-')}
                           </span>
                         </div>
                       </div>
