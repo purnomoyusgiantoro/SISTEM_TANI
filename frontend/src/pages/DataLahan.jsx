@@ -229,7 +229,7 @@ export default function DataLahan() {
                 >
                   <option value="">Pilih Wilayah...</option>
                   {daftarWilayah.map((w, idx) => (
-                    <option key={typeof w === 'object' ? w.id || idx : w} value={typeof w === 'object' ? w.nama : w}>{typeof w === 'object' ? w.nama : w}</option>
+                    <option key={typeof w === 'object' && w !== null ? w.id || idx : w} value={typeof w === 'object' && w !== null ? w.nama : w}>{typeof w === 'object' && w !== null ? w.nama : w}</option>
                   ))}
                 </select>
               </div>
@@ -467,7 +467,7 @@ export default function DataLahan() {
                   >
                     <option value="">Pilih Jenis</option>
                     {jenisLahanOptions.map((j, idx) => (
-                      <option key={typeof j === 'object' ? j.id || idx : j} value={typeof j === 'object' ? j.nama || j.value : j}>{typeof j === 'object' ? j.nama || j.label : j}</option>
+                      <option key={typeof j === 'object' && j !== null ? j.id || idx : j} value={typeof j === 'object' && j !== null ? j.nama || j.value : j}>{typeof j === 'object' && j !== null ? j.nama || j.label : j}</option>
                     ))}
                   </select>
                   <ChevronDown size={14} className="lahan-select-icon" />
