@@ -320,7 +320,7 @@ export default function Dashboard() {
               {(stats.log_aktivitas || []).filter(Boolean).slice(0, 5).map((log) => (
                 <div key={log.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-border-light)', paddingBottom: '8px', fontSize: '0.85rem' }}>
                   <div>
-                    <span style={{ fontWeight: '600', color: 'var(--color-text)' }}>{log.user_name || log.user || '-'}</span>
+                    <span style={{ fontWeight: '600', color: 'var(--color-text)' }}>{log.user_name || (typeof log.user === 'object' ? log.user?.nama : log.user) || '-'}</span>
                     <span style={{ color: 'var(--color-text-secondary)', marginLeft: '4px' }}>({log.aksi})</span>
                     <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>{log.detail}</div>
                   </div>

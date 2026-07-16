@@ -107,10 +107,13 @@ export default function Pembayaran() {
     if (!searchQuery) return myTagihan;
     const q = searchQuery.toLowerCase();
     return myTagihan.filter(
-      (t) =>
-        (t.id + '').toLowerCase().includes(q) ||
-        (t.peralatan || '').toLowerCase().includes(q) ||
-        (t.petani?.nama || t.petani || '').toLowerCase().includes(q)
+      (t) => {
+        const peralatanStr = typeof t.peralatan === 'object' ? (t.peralatan?.nama || '') : (t.peralatan || '');
+        const petaniStr = typeof t.petani === 'object' ? (t.petani?.nama || '') : (t.petani || '');
+        return (t.id + '').toLowerCase().includes(q) ||
+        peralatanStr.toLowerCase().includes(q) ||
+        petaniStr.toLowerCase().includes(q);
+      }
     );
   }, [myTagihan, searchQuery]);
 
@@ -261,8 +264,8 @@ export default function Pembayaran() {
                       return (
                         <tr key={t.id}>
                           <td style={{ fontFamily: 'monospace', fontWeight: 600, color: '#1a365d' }}>{t.id}</td>
-                          <td style={{ fontWeight: 600 }}>{t.peralatan}</td>
-                          {!isPetani && <td>{t.petani}</td>}
+                          <td style={{ fontWeight: 600 }}>{typeof t.peralatan === 'object' ? t.peralatan?.nama : t.peralatan}</td>
+                          {!isPetani && <td>{typeof t.petani === 'object' ? t.petani?.nama : t.petani}</td>}
                           <td style={{ fontWeight: 700 }}>{formatRupiah(t.jumlah)}</td>
                           <td>
                             <div className={`pembayaran-card-due${cd.overdue ? ' overdue' : ''}`}>
@@ -332,8 +335,8 @@ export default function Pembayaran() {
                   myTagihan.map((t) => (
                     <tr key={t.id}>
                       <td style={{ fontFamily: 'monospace', fontWeight: 600, color: '#1a365d' }}>{t.id}</td>
-                      <td>{t.peralatan}</td>
-                      {!isPetani && <td>{t.petani}</td>}
+                      <td>{typeof t.peralatan === 'object' ? t.peralatan?.nama : t.peralatan}</td>
+                      {!isPetani && <td>{typeof t.petani === 'object' ? t.petani?.nama : t.petani}</td>}
                       <td style={{ fontWeight: 600 }}>{formatRupiah(t.jumlah)}</td>
                       <td>{formatTanggal(t.tanggalTagihan)}</td>
                       <td>{formatTanggal(t.jatuhTempo)}</td>
@@ -373,7 +376,7 @@ export default function Pembayaran() {
                       .filter((t) => t.status === 'belum_bayar')
                       .map((t) => (
                         <option key={t.id} value={t.id}>
-                          {t.id} — {t.peralatan} — {formatRupiah(t.jumlah)}
+                          {t.id} — {typeof t.peralatan === 'object' ? t.peralatan?.nama : t.peralatan} — {formatRupiah(t.jumlah)}
                         </option>
                       ))}
                   </select>
@@ -474,9 +477,9 @@ export default function Pembayaran() {
                       .filter((t) => t.status === 'menunggu_verifikasi')
                       .map((t) => (
                         <tr key={t.id}>
-                          <td style={{ fontWeight: 600 }}>{t.petani}</td>
+                          <td style={{ fontWeight: 600 }}>{typeof t.petani === 'object' ? t.petani?.nama : t.petani}</td>
                           <td style={{ fontFamily: 'monospace', color: '#1a365d' }}>{t.id}</td>
-                          <td>{t.peralatan}</td>
+                          <td>{typeof t.peralatan === 'object' ? t.peralatan?.nama : t.peralatan}</td>
                           <td style={{ fontWeight: 600 }}>{formatRupiah(t.jumlah)}</td>
                           <td>{formatTanggal(t.tanggalBayar)}</td>
                           <td>{t.buktiPembayaran || '-'}</td>
@@ -517,8 +520,8 @@ export default function Pembayaran() {
             <>
               <p>
                 {verifikasiAction === 'approve'
-                  ? `Anda yakin ingin menyetujui pembayaran ${verifikasiModal.id} dari ${verifikasiModal.petani} sebesar ${formatRupiah(verifikasiModal.jumlah)}?`
-                  : `Anda yakin ingin menolak pembayaran ${verifikasiModal.id} dari ${verifikasiModal.petani}? Status akan dikembalikan ke "Belum Bayar".`}
+                  ? `Anda yakin ingin menyetujui pembayaran ${verifikasiModal.id} dari ${typeof verifikasiModal.petani === 'object' ? verifikasiModal.petani?.nama : verifikasiModal.petani} sebesar ${formatRupiah(verifikasiModal.jumlah)}?`
+                  : `Anda yakin ingin menolak pembayaran ${verifikasiModal.id} dari ${typeof verifikasiModal.petani === 'object' ? verifikasiModal.petani?.nama : verifikasiModal.petani}? Status akan dikembalikan ke "Belum Bayar".`}
               </p>
               <div className="pembayaran-modal-actions">
                 <button

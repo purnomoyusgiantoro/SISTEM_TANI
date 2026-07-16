@@ -337,8 +337,8 @@ export default function SewaPeralatan() {
                 filteredSewa.map((sewa) => (
                   <tr key={sewa.id} style={{ borderBottom: '1px solid var(--color-border-light)', fontSize: '0.875rem' }}>
                     <td style={{ padding: '12px', fontWeight: '600' }}>{sewa.id}</td>
-                    {currentUser.role === 'pengurus' && <td style={{ padding: '12px' }}>{sewa.petani?.nama || sewa.petani || '-'}</td>}
-                    <td style={{ padding: '12px', fontWeight: '600' }}>{sewa.peralatan?.nama || sewa.peralatan || '-'}</td>
+                    {currentUser.role === 'pengurus' && <td style={{ padding: '12px' }}>{typeof sewa.petani === 'object' ? (sewa.petani?.nama || '-') : (sewa.petani || '-')}</td>}
+                    <td style={{ padding: '12px', fontWeight: '600' }}>{typeof sewa.peralatan === 'object' ? (sewa.peralatan?.nama || '-') : (sewa.peralatan || '-')}</td>
                     <td style={{ padding: '12px' }}>{formatTanggal(sewa.tanggal_mulai || sewa.tanggalMulai)}</td>
                     <td style={{ padding: '12px' }}>{formatTanggal(sewa.tanggal_selesai || sewa.tanggalSelesai)}</td>
                     <td style={{ padding: '12px', fontWeight: '700' }}>{formatRupiah(sewa.total_biaya || sewa.totalBiaya)}</td>
