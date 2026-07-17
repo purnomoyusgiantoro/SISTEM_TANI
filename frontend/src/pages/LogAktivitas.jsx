@@ -43,7 +43,26 @@ export default function LogAktivitas() {
   };
 
   const handleExport = () => {
-    alert('Mengekspor log aktivitas ke CSV...');
+    if (filteredLogs.length === 0) {
+      alert('Tidak ada data untuk diekspor');
+      return;
+    }
+    const headers = ['Waktu', 'Pengguna', 'Aktivitas', 'Detail', 'Level'];
+    const csvContent = [
+      headers.join(','),
+      ...filteredLogs.map(log => {
+        const user = typeof log.user === 'object' ? (log.user?.nama || '') : (log.user || '');
+        return `"${log.created_at || log.waktu}","${user}","${log.aksi}","${log.detail}","${log.level}"`;
+      })
+    ].join('\\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', 'log_aktivitas.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -56,7 +75,7 @@ export default function LogAktivitas() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button 
-              onClick={() => setLogs(Mock.logAktivitas)}
+              onClick={() => fetchLogs()}
               style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0 16px', border: '1px solid var(--color-border)', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600', background: 'white', cursor: 'pointer', height: '38px', boxSizing: 'border-box' }}
             >
               <RefreshCw size={14} /> Refresh

@@ -110,7 +110,7 @@ export default function Berita() {
                   <div className="berita-card-title">{berita.judul}</div>
                   <div className="berita-card-excerpt">{berita.isi}</div>
                   <div className="berita-card-footer">
-                    <span className="berita-card-author" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><User size={12} /> {berita.penulis}</span>
+                    <span className="berita-card-author" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><User size={12} /> {typeof berita.penulis === 'object' ? (berita.penulis?.nama || '-') : (berita.penulis || '-')}</span>
                     <span className="berita-card-date" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Calendar size={12} /> {formatTanggal(berita.tanggal)}</span>
                   </div>
                 </div>
@@ -141,7 +141,7 @@ export default function Berita() {
             </div>
             <div className="berita-detail-body">
               <div className="berita-detail-meta">
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><User size={14} /> {selectedBerita.penulis}</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><User size={14} /> {typeof selectedBerita.penulis === 'object' ? (selectedBerita.penulis?.nama || '-') : (selectedBerita.penulis || '-')}</span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Calendar size={14} /> {formatTanggal(selectedBerita.tanggal)}</span>
               </div>
               <div className="berita-detail-content">{selectedBerita.isi}</div>

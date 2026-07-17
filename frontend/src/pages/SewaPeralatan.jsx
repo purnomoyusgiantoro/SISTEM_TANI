@@ -201,7 +201,7 @@ export default function SewaPeralatan() {
           className={`sewa-tab-btn ${activeTab === 'riwayat' ? 'active' : ''}`}
           onClick={() => setActiveTab('riwayat')}
         >
-          {currentUser.role === 'pengurus' ? 'Validasi & Riwayat Sewa' : 'Riwayat Sewa Saya'}
+          {currentUser?.role === 'pengurus' ? 'Validasi & Riwayat Sewa' : 'Riwayat Sewa Saya'}
         </button>
       </div>
 
@@ -242,7 +242,7 @@ export default function SewaPeralatan() {
               <Wind size={16} />
             </button>
 
-            {currentUser.role === 'pengurus' && (
+            {currentUser?.role === 'pengurus' && (
               <button 
                 onClick={() => setShowAddModal(true)}
                 className="filter-btn filter-btn-primary"
@@ -286,7 +286,7 @@ export default function SewaPeralatan() {
                     >
                       Detail
                     </button>
-                    {currentUser.role === 'petani' && (
+                    {currentUser?.role === 'petani' && (
                       <button 
                         disabled={alat.tersedia === 0}
                         onClick={() => { setSelectedAlat(alat); setShowRentModal(true); }}
@@ -322,14 +322,14 @@ export default function SewaPeralatan() {
             <thead>
               <tr style={{ background: '#f8f9fa', borderBottom: '2px solid #dee2e6', fontSize: '0.85rem', color: '#333', fontWeight: 'bold' }}>
                 <th style={{ padding: '12px' }}>ID Sewa</th>
-                {currentUser.role === 'pengurus' && <th style={{ padding: '12px' }}>Penyewa (Petani)</th>}
+                {currentUser?.role === 'pengurus' && <th style={{ padding: '12px' }}>Penyewa (Petani)</th>}
                 <th style={{ padding: '12px' }}>Peralatan</th>
                 <th style={{ padding: '12px' }}>Tanggal Mulai</th>
                 <th style={{ padding: '12px' }}>Tanggal Selesai</th>
                 <th style={{ padding: '12px' }}>Biaya</th>
                 <th style={{ padding: '12px' }}>Validasi</th>
                 <th style={{ padding: '12px' }}>Status Sewa</th>
-                {currentUser.role === 'pengurus' && <th style={{ padding: '12px' }}>Aksi</th>}
+                {currentUser?.role === 'pengurus' && <th style={{ padding: '12px' }}>Aksi</th>}
               </tr>
             </thead>
             <tbody>
@@ -337,7 +337,7 @@ export default function SewaPeralatan() {
                 filteredSewa.map((sewa) => (
                   <tr key={sewa.id} style={{ borderBottom: '1px solid var(--color-border-light)', fontSize: '0.875rem' }}>
                     <td style={{ padding: '12px', fontWeight: '600' }}>{sewa.id}</td>
-                    {currentUser.role === 'pengurus' && <td style={{ padding: '12px' }}>{typeof sewa.petani === 'object' ? (sewa.petani?.nama || '-') : (sewa.petani || '-')}</td>}
+                    {currentUser?.role === 'pengurus' && <td style={{ padding: '12px' }}>{typeof sewa.petani === 'object' ? (sewa.petani?.nama || '-') : (sewa.petani || '-')}</td>}
                     <td style={{ padding: '12px', fontWeight: '600' }}>{typeof sewa.peralatan === 'object' ? (sewa.peralatan?.nama || '-') : (sewa.peralatan || '-')}</td>
                     <td style={{ padding: '12px' }}>{formatTanggal(sewa.tanggal_mulai || sewa.tanggalMulai)}</td>
                     <td style={{ padding: '12px' }}>{formatTanggal(sewa.tanggal_selesai || sewa.tanggalSelesai)}</td>
@@ -358,7 +358,7 @@ export default function SewaPeralatan() {
                     <td style={{ padding: '12px' }}>
                       <StatusBadge status={sewa.status} />
                     </td>
-                    {currentUser.role === 'pengurus' && (
+                    {currentUser?.role === 'pengurus' && (
                       <td style={{ padding: '12px' }}>
                         {sewa.validasi === 'pending' ? (
                           <div style={{ display: 'flex', gap: '6px' }}>
@@ -384,7 +384,7 @@ export default function SewaPeralatan() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={currentUser.role === 'pengurus' ? 9 : 8} style={{ textAlign: 'center', padding: '40px 12px', color: 'var(--color-text-muted)' }}>
+                  <td colSpan={currentUser?.role === 'pengurus' ? 9 : 8} style={{ textAlign: 'center', padding: '40px 12px', color: 'var(--color-text-muted)' }}>
                     Belum ada riwayat sewa
                   </td>
                 </tr>
@@ -540,8 +540,7 @@ export default function SewaPeralatan() {
                   value={newItemKategori}
                   onChange={(e) => setNewItemKategori(e.target.value)}
                   style={{ width: '100%' }}
-                >
-                  {Mock.kategoriPeralatan.map(cat => (
+                  {['Traktor', 'Mesin Air', 'Alat Tanam', 'Lainnya'].map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>
@@ -604,3 +603,4 @@ export default function SewaPeralatan() {
     </div>
   );
 }
+

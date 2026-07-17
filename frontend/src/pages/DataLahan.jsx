@@ -110,7 +110,7 @@ export default function DataLahan() {
   // Role-based data
   const baseData = useMemo(() => {
     if (currentUser?.role === 'petani') {
-      return dataLahan.filter((l) => l.pemilikId === currentUser.id || l.pemilik_id === currentUser.id);
+      return dataLahan.filter((l) => l.pemilikId === currentUser?.id || l.pemilik_id === currentUser?.id);
     }
     return dataLahan;
   }, [currentUser, dataLahan]);
@@ -130,7 +130,8 @@ export default function DataLahan() {
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      result = result.filter((l) => l.pemilik.toLowerCase().includes(q));
+      const getPemilikStr = (p) => typeof p === 'object' ? (p?.nama || '') : (p || '');
+      result = result.filter((l) => getPemilikStr(l.pemilik).toLowerCase().includes(q) || (l.lokasi || '').toLowerCase().includes(q));
     }
 
     return result;
@@ -161,10 +162,10 @@ export default function DataLahan() {
   const openEditModal = (lahan) => {
     setEditingLahan(lahan);
     setFormData({
-      pemilik: lahan.pemilik,
+      pemilik: typeof lahan.pemilik === 'object' ? (lahan.pemilik?.nama || '') : (lahan.pemilik || ''),
       lokasi: lahan.lokasi,
       luas: lahan.luas,
-      jenisLahan: lahan.jenisLahan,
+      jenisLahan: lahan.jenis_lahan || lahan.jenisLahan,
       koordinat: lahan.koordinat,
       catatan: lahan.catatan || '',
     });
@@ -180,22 +181,30 @@ export default function DataLahan() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    // Mock save — in a real app this would call an API
-    alert(editingLahan ? 'Data lahan berhasil diperbarui!' : 'Lahan baru berhasil ditambahkan!');
-    setShowFormModal(false);
+    try {
+      const payload = {
+        ...formData,
+        jenis_lahan: formData.jenisLahan,
+      };
+
+      if (editingLahan) {
+        await updateLahan(editingLahan.id, payload);
+        toast.success('Data lahan berhasil diperbarui!');
+      } else {
+        await createLahan(payload);
+        toast.success('Lahan baru berhasil ditambahkan!');
+      }
+      fetchLahan();
+      setShowFormModal(false);
+    } catch (err) {
+      toast.error(err.message || 'Terjadi kesalahan saat menyimpan data lahan');
+    }
   };
 
   const canAdd = hasPermission('add_lahan');
   const canEdit = hasPermission('edit_lahan') || hasPermission('edit_own_lahan');
-
-  const verificationHistory = [
-    { tanggal: '2026-01-16', aksi: 'Pengajuan diterima oleh sistem', user: 'Sistem' },
-    { tanggal: '2026-01-18', aksi: 'Dijadwalkan untuk verifikasi lapangan', user: 'Ahmad Hidayat' },
-    { tanggal: '2026-01-22', aksi: 'Verifikasi lapangan selesai', user: 'Ir. Hendra Wijaya' },
-    { tanggal: '2026-01-23', aksi: 'Lahan diverifikasi dan disetujui', user: 'Ir. Hendra Wijaya' },
-  ];
 
   return (
     <>
@@ -579,30 +588,19 @@ export default function DataLahan() {
               </div>
 
               {/* Verification History */}
-              {(detailLahan.status_verifikasi === 'terverifikasi' || detailLahan.statusVerifikasi === 'terverifikasi') && (
-                <div className="lahan-detail-history">
-                  <h4 className="lahan-detail-section-title">
-                    <Clock size={16} />
-                    Riwayat Verifikasi
-                  </h4>
+              {detailLahan.statusVerifikasi === 'terverifikasi' && (
+                <div className="lahan-detail-section">
+                  <h4 className="lahan-detail-section-title">Status Verifikasi</h4>
                   <div className="lahan-timeline">
-                    {verificationHistory.map((item, idx) => (
-                      <div className="lahan-timeline-item" key={idx}>
-                        <div className="lahan-timeline-dot">
-                          {idx === verificationHistory.length - 1 ? (
-                            <CheckCircle2 size={16} />
-                          ) : (
-                            <div className="lahan-timeline-circle" />
-                          )}
-                        </div>
-                        <div className="lahan-timeline-content">
-                          <p className="lahan-timeline-action">{item.aksi}</p>
-                          <span className="lahan-timeline-meta">
-                            {formatTanggal(item.tanggal)} — {typeof item.user === 'object' ? (item.user?.nama || '-') : (item.user || '-')}
-                          </span>
-                        </div>
+                    <div className="lahan-timeline-item">
+                      <div className="lahan-timeline-dot"><CheckCircle2 size={16} /></div>
+                      <div className="lahan-timeline-content">
+                        <p className="lahan-timeline-action">Lahan diverifikasi dan disetujui</p>
+                        <span className="lahan-timeline-meta">
+                          Oleh: {typeof detailLahan.verifikator === 'object' ? (detailLahan.verifikator?.nama || '-') : (detailLahan.verifikator || '-')}
+                        </span>
                       </div>
-                    ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -613,7 +611,7 @@ export default function DataLahan() {
                   <div>
                     <strong>Verifikasi Ditolak</strong>
                     <p>Alasan: {detailLahan.catatan}</p>
-                    <span>Oleh: {detailLahan.verifikator}</span>
+                    <span>Oleh: {typeof detailLahan.verifikator === 'object' ? (detailLahan.verifikator?.nama || '-') : (detailLahan.verifikator || '-')}</span>
                   </div>
                 </div>
               )}
@@ -631,7 +629,7 @@ export default function DataLahan() {
               {detailLahan.verifikator && (
                 <div className="lahan-detail-verifikator">
                   <User size={14} />
-                  <span>Diverifikasi oleh: <strong>{detailLahan.verifikator}</strong></span>
+                  <span>Diverifikasi oleh: <strong>{typeof detailLahan.verifikator === 'object' ? (detailLahan.verifikator?.nama || '-') : (detailLahan.verifikator || '-')}</strong></span>
                 </div>
               )}
             </div>

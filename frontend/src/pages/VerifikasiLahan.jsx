@@ -114,11 +114,11 @@ export default function VerifikasiLahan() {
           <span className="filter-label"><Filter size={14} /> Filter:</span>
           <select className="verifikasi-filter-select" value={filterWilayah} onChange={e => setFilterWilayah(e.target.value)}>
             <option value="">Semua Wilayah</option>
-            {Mock.daftarWilayah.map(w => <option key={w} value={w}>{w}</option>)}
+            {['Desa Suka Maju', 'Desa Tani Jaya', 'Kecamatan Makmur'].map(w => <option key={w} value={w}>{w}</option>)}
           </select>
           <select className="verifikasi-filter-select" value={filterJenis} onChange={e => setFilterJenis(e.target.value)}>
             <option value="">Semua Jenis</option>
-            {Mock.jenisLahanOptions.map(j => <option key={j} value={j}>{j}</option>)}
+            {['Sawah', 'Tegal', 'Pekarangan'].map(j => <option key={j} value={j}>{j}</option>)}
           </select>
           <input type="date" className="verifikasi-filter-input" value={filterDateFrom} onChange={e => setFilterDateFrom(e.target.value)} placeholder="Dari" />
           <input type="date" className="verifikasi-filter-input" value={filterDateTo} onChange={e => setFilterDateTo(e.target.value)} placeholder="Sampai" />

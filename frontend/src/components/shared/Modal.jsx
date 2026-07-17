@@ -79,7 +79,7 @@ const styles = `
   }
 `;
 
-export default function Modal({ isOpen, onClose, title, children, footer, size = '' }) {
+export default function Modal({ isOpen = true, onClose, title, children, footer, size = '' }) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';

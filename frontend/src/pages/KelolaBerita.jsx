@@ -144,7 +144,7 @@ export default function KelolaBerita() {
                       {berita.isi}
                     </div>
                   </td>
-                  <td>{berita.penulis}</td>
+                  <td>{typeof berita.penulis === 'object' ? (berita.penulis?.nama || '-') : (berita.penulis || '-')}</td>
                   <td>{formatTanggal(berita.tanggal)}</td>
                   <td><StatusBadge status={berita.status} /></td>
                   <td>

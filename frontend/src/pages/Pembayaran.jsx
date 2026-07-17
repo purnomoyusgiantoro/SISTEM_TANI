@@ -39,8 +39,10 @@ function StatusBadge({ status }) {
 
 function hitungCountdown(jatuhTempo, status) {
   if (status === 'lunas') return { text: 'Sudah lunas', overdue: false };
+  if (!jatuhTempo) return { text: '-', overdue: false };
   const now = new Date();
   const due = new Date(jatuhTempo);
+  if (isNaN(due.getTime())) return { text: '-', overdue: false };
   const diff = Math.ceil((due - now) / (1000 * 60 * 60 * 24));
   if (diff < 0) return { text: `Terlambat ${Math.abs(diff)} hari`, overdue: true };
   if (diff === 0) return { text: 'Jatuh tempo hari ini', overdue: true };

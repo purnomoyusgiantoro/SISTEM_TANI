@@ -38,21 +38,21 @@ export default function StrukturOrganisasi() {
         <div 
           className={`org-node-card ${isLevelRoot ? 'root' : ''}`}
           onClick={() => {
-            if (currentUser.role === 'pengurus') {
+            if (currentUser?.role === 'pengurus') {
               setSelectedNode(node);
               setEditName(node.nama);
               setEditJabatan(node.jabatan);
             }
           }}
           style={{
-            cursor: currentUser.role === 'pengurus' ? 'pointer' : 'default'
+            cursor: currentUser?.role === 'pengurus' ? 'pointer' : 'default'
           }}
         >
           <div className="org-node-details">
             <h4 className="org-node-name">{node.nama}</h4>
             <span className="org-node-title">{node.jabatan}</span>
           </div>
-          {currentUser.role === 'pengurus' && (
+          {currentUser?.role === 'pengurus' && (
             <div className="org-node-actions-hint">
               <Edit size={12} /> Edit
             </div>
@@ -114,7 +114,13 @@ export default function StrukturOrganisasi() {
           <div className="org-chart-wrapper">
         <div className="org-tree">
           <ul>
-            {renderNode(treeData)}
+            {loading ? (
+              <li style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>Memuat struktur organisasi...</li>
+            ) : Array.isArray(treeData) && treeData.length > 0 ? (
+              treeData.map(node => renderNode(node))
+            ) : (
+              <li style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>Data struktur organisasi belum tersedia.</li>
+            )}
           </ul>
         </div>
       </div>
@@ -171,3 +177,4 @@ export default function StrukturOrganisasi() {
     </div>
   );
 }
+

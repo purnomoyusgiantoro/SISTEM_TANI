@@ -39,9 +39,9 @@ export default function AnalisisData() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button 
               style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 16px', background: 'var(--color-primary)', color: 'white', borderRadius: '8px', fontWeight: '600', fontSize: '0.85rem', height: '38px', boxSizing: 'border-box', cursor: 'pointer' }}
-              onClick={() => alert('Mengunduh laporan PDF...')}
+              onClick={() => window.print()}
             >
-              <Download size={16} /> Unduh Laporan PDF
+              <Download size={16} /> Cetak / Simpan PDF
             </button>
             <nav style={{ marginBottom: 0, fontSize: '0.85rem', display: 'flex', alignItems: 'center', color: 'var(--color-primary)' }}>
               <span style={{ margin: '0 8px' }}>/</span>

@@ -47,10 +47,10 @@ export function AuthProvider({ children }) {
     async (role) => {
       // Preset demo accounts
       const demoAccounts = {
-        petani: { email: 'petani@ruangtani.com', password: 'password' },
-        pengurus: { email: 'pengurus@ruangtani.com', password: 'password' },
-        bpp: { email: 'bpp@ruangtani.com', password: 'password' },
-        admin: { email: 'admin@ruangtani.com', password: 'password' },
+        petani: { email: 'budi@ruangtani.id', password: 'password' },
+        pengurus: { email: 'ahmad@ruangtani.id', password: 'password' },
+        bpp: { email: 'hendra@ruangtani.id', password: 'password' },
+        admin: { email: 'admin@ruangtani.id', password: 'password' },
       };
 
       const account = demoAccounts[role];
@@ -93,7 +93,7 @@ export function AuthProvider({ children }) {
       if (!currentUser) return false;
       const permissions = {
         petani: [
-          'view_own_lahan', 'edit_own_lahan', 'sewa_barang', 'view_barang',
+          'view_own_lahan', 'edit_own_lahan', 'add_lahan', 'sewa_barang', 'view_barang',
           'view_organisasi', 'update_kegiatan', 'view_tagihan', 'upload_bukti_bayar',
           'view_berita',
         ],

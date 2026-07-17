@@ -115,10 +115,10 @@ export default function Header({ toggleMobileSidebar }) {
               </div>
               <div className="header-notification-list">
                 {notifications.length > 0 ? (
-                  notifications.map((notif) => (
+                  notifications.map((notif, idx) => (
                     <div 
-                      key={notif.id} 
-                      className={`header-notification-item ${!notif.dibaca ? 'unread' : ''}`}
+                      key={notif?.id || idx} 
+                      className={`header-notification-item ${!notif?.dibaca ? 'unread' : ''}`}
                       style={{
                         padding: '12px 16px',
                         borderBottom: '1px solid var(--color-border)',
@@ -126,13 +126,13 @@ export default function Header({ toggleMobileSidebar }) {
                         fontSize: '0.85rem'
                       }}
                     >
-                      <div style={{ fontWeight: !notif.dibaca ? '800' : '600', color: 'var(--color-text)', marginBottom: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        {!notif.dibaca && <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-info)' }}></span>}
-                        {notif.judul}
+                      <div style={{ fontWeight: !notif?.dibaca ? '800' : '600', color: 'var(--color-text)', marginBottom: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {!notif?.dibaca && <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-info)' }}></span>}
+                        {notif?.judul}
                       </div>
-                      <div style={{ color: 'var(--color-text-secondary)' }}>{notif.pesan}</div>
+                      <div style={{ color: 'var(--color-text-secondary)' }}>{notif?.pesan}</div>
                       <small style={{ display: 'block', marginTop: '4px', color: 'var(--color-text-muted)' }}>
-                        {notif.waktu}
+                        {notif?.waktu}
                       </small>
                     </div>
                   ))

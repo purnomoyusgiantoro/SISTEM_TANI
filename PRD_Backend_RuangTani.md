@@ -18,10 +18,10 @@
 
 ## 1. Ringkasan Proyek
 
-RuangTani adalah sistem informasi kelompok tani berbasis web yang mengelola **data lahan pertanian**, **sewa peralatan**, **pembayaran**, **kegiatan petani**, dan **berita/penyuluhan**. Saat ini frontend (React) sudah dibangun lengkap menggunakan **mock data statis**. Dokumen PRD ini mendefinisikan kebutuhan **database** dan **backend API (Laravel)** untuk menggantikan mock data dengan data real yang persisten.
+RuangTani adalah sistem informasi kelompok tani berbasis web yang mengelola **data lahan pertanian**, **sewa peralatan**, **pembayaran**, **kegiatan petani**, dan **berita/penyuluhan**. Sistem ini terbagi menjadi frontend (React) dan backend (Laravel). Dokumen PRD ini mendefinisikan skema **database** dan **backend API (Laravel)** yang telah dibangun untuk menyediakan data real dan persisten bagi frontend.
 
 ### 1.1. Tujuan
-- Membangun REST API menggunakan Laravel yang melayani seluruh kebutuhan data frontend
+- Mendokumentasikan REST API Laravel yang melayani seluruh kebutuhan data frontend
 - Merancang skema database relasional yang menampung seluruh entitas bisnis
 - Menerapkan autentikasi berbasis token (Sanctum) dan otorisasi berbasis peran (role)
 - Menyediakan file upload untuk bukti pembayaran dan foto kegiatan

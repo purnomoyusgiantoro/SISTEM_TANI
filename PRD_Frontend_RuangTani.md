@@ -20,11 +20,11 @@
 
 ## 1. Ringkasan Proyek
 
-Frontend RuangTani adalah aplikasi **Single Page Application (SPA)** yang menjadi antarmuka utama bagi pengguna sistem. Aplikasi ini terhubung ke Backend API (Laravel) untuk seluruh operasi data. Saat ini, frontend sudah dibangun dengan **mock data statis** (`mockData.js`) dan perlu dimigrasi untuk menggunakan **API backend real**.
+Frontend RuangTani adalah aplikasi **Single Page Application (SPA)** yang menjadi antarmuka utama bagi pengguna sistem. Aplikasi ini telah terintegrasi sepenuhnya dengan Backend API (Laravel) untuk seluruh operasi data, menggantikan penggunaan mock data statis.
 
 ### 1.1. Tujuan Frontend
 - Menyediakan antarmuka yang responsif dan modern untuk semua peran pengguna
-- Menghubungkan seluruh halaman dengan Backend API (menggantikan mock data)
+- Terhubung secara penuh dengan Backend API untuk manajemen state dan data persisten
 - Implementasi autentikasi token-based (Sanctum) untuk login/logout
 - Mendukung multi-role dashboard dengan tampilan yang sesuai untuk setiap peran
 - Menangani file upload (bukti pembayaran, foto kegiatan, gambar peralatan)
@@ -99,20 +99,20 @@ src/
 │
 ├── pages/                        # Halaman utama
 │   ├── LandingPage.jsx           # Halaman landing publik
-│   ├── Login.jsx                 # [MODIFY] Connect ke API
-│   ├── Dashboard.jsx             # [MODIFY] Connect ke API
-│   ├── DataLahan.jsx             # [MODIFY] Connect ke API
-│   ├── SewaPeralatan.jsx         # [MODIFY] Connect ke API
-│   ├── Pembayaran.jsx            # [MODIFY] Connect ke API
-│   ├── Kegiatan.jsx              # [MODIFY] Connect ke API
-│   ├── StrukturOrganisasi.jsx    # [MODIFY] Connect ke API
-│   ├── Berita.jsx                # [MODIFY] Connect ke API
-│   ├── VerifikasiLahan.jsx       # [MODIFY] Connect ke API
-│   ├── KelolaBerita.jsx          # [MODIFY] Connect ke API
-│   ├── AnalisisData.jsx          # [MODIFY] Connect ke API
-│   ├── KelolaPengguna.jsx        # [MODIFY] Connect ke API
-│   ├── LogAktivitas.jsx          # [MODIFY] Connect ke API
-│   └── BackupData.jsx            # [MODIFY] Connect ke API
+│   ├── Login.jsx                 # Halaman Autentikasi
+│   ├── Dashboard.jsx             # Beranda & Statistik
+│   ├── DataLahan.jsx             # Manajemen Data Lahan
+│   ├── SewaPeralatan.jsx         # Manajemen Sewa
+│   ├── Pembayaran.jsx            # Tagihan & Verifikasi Pembayaran
+│   ├── Kegiatan.jsx              # Catatan Kegiatan
+│   ├── StrukturOrganisasi.jsx    # Chart Organisasi
+│   ├── Berita.jsx                # Feed Berita Publik
+│   ├── VerifikasiLahan.jsx       # BPP Verifikasi Lahan
+│   ├── KelolaBerita.jsx          # CRUD Berita
+│   ├── AnalisisData.jsx          # Report & Analitik
+│   ├── KelolaPengguna.jsx        # Admin User Management
+│   ├── LogAktivitas.jsx          # Admin Logs
+│   └── BackupData.jsx            # Admin Backup System
 │
 ├── utils/                        # [NEW] Utility functions
 │   ├── formatters.js             # Format tanggal, rupiah, dll.

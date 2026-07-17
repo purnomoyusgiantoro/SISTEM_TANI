@@ -171,8 +171,12 @@ export default function Kegiatan() {
     if (role === 'petani') list = list.filter((k) => k.petaniId === currentUser?.id);
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
+      const getPetaniStr = (p) => typeof p === 'object' ? (p?.nama || '') : (p || '');
+      const getLokasiStr = (l) => typeof l === 'object' ? (l?.lokasi || '') : (l || '');
       list = list.filter(
-        (k) => k.deskripsi.toLowerCase().includes(q) || k.petani.toLowerCase().includes(q) || k.lokasi.toLowerCase().includes(q)
+        (k) => (k?.deskripsi || '').toLowerCase().includes(q) || 
+               getPetaniStr(k?.petani).toLowerCase().includes(q) || 
+               getLokasiStr(k?.lahan || k?.lokasi).toLowerCase().includes(q)
       );
     }
     if (filterJenis) list = list.filter((k) => k.jenis === filterJenis);
@@ -309,7 +313,7 @@ export default function Kegiatan() {
                   const cfg = getJenisConfig(item.jenis);
                   return (
                     <div
-                      key={item.id}
+                      key={item?.id || Math.random()}
                       style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px', background: 'white', border: '1px solid var(--color-border-light)', borderRadius: '12px', borderTop: `4px solid ${cfg.color}`, boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}
                     >
                       {/* Card Header: Title */}
@@ -336,7 +340,7 @@ export default function Kegiatan() {
                       {/* Card Footer: Meta Info */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '12px', borderTop: '1px solid var(--color-border-light)', fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <MapPin size={14} color="var(--color-primary)" /> {item.lokasi}
+                          <MapPin size={14} color="var(--color-primary)" /> {typeof item?.lahan === 'object' ? item?.lahan?.lokasi : item?.lokasi}
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <Clock size={14} color="var(--color-primary)" /> {formatTanggal(item.tanggal)}
@@ -388,9 +392,9 @@ export default function Kegiatan() {
               <label>Lahan</label>
               <select value={formLahan} onChange={(e) => setFormLahan(e.target.value)} required>
                 <option value="">-- Pilih lahan --</option>
-                {userLahan.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.lokasi} ({l.luas} Ha — {l.jenisLahan})
+                {userLahan.map((l, idx) => (
+                  <option key={l?.id || idx} value={l?.id || ''}>
+                    {l?.lokasi} ({l?.luas} Ha — {l?.jenis_lahan || l?.jenisLahan})
                   </option>
                 ))}
               </select>
