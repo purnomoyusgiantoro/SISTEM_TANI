@@ -150,7 +150,7 @@ export default function Header({ toggleMobileSidebar }) {
         <div className="header-profile" ref={profileRef} style={{ position: 'relative' }}>
           <button 
             className="flex items-center gap-2" 
-            onClick={() => setShowProfileMenu(!showProfileMenu)}
+            onClick={(e) => { e.preventDefault(); setShowProfileMenu(prev => !prev); }}
             style={{ padding: '4px 12px 4px 4px', borderRadius: '24px', border: '1px solid var(--color-border)', background: 'white', transition: 'background 0.2s', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
           >
             <div className="sidebar-user-avatar" style={{ width: '32px', height: '32px', fontSize: '0.8rem', background: '#f8f9fa', color: '#495057', border: '1px solid #dee2e6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
