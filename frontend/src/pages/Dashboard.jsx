@@ -344,7 +344,22 @@ export default function Dashboard() {
       {/* Welcome Greeting Header */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          <button style={{ background: 'white', padding: '8px 16px', borderRadius: '24px', border: '1px solid var(--color-border)', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-primary)', boxShadow: 'var(--shadow-xs)', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+          <button 
+            onClick={() => {
+              import('html2pdf.js').then((html2pdf) => {
+                const element = document.querySelector('.admin-card') || document.body;
+                const opt = {
+                  margin: 0.5,
+                  filename: 'Dashboard_Report.pdf',
+                  image: { type: 'jpeg', quality: 0.98 },
+                  html2canvas: { scale: 2, useCORS: true },
+                  jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+                html2pdf.default().set(opt).from(element).save();
+              });
+            }}
+            style={{ background: 'white', padding: '8px 16px', borderRadius: '24px', border: '1px solid var(--color-border)', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-primary)', boxShadow: 'var(--shadow-xs)', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
+          >
             <Download size={14} /> Unduh Laporan PDF
           </button>
           <div style={{ background: 'white', padding: '8px 16px', borderRadius: '24px', border: '1px solid var(--color-border)', fontSize: '0.85rem', fontWeight: '600', color: 'var(--color-text-secondary)', boxShadow: 'var(--shadow-xs)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>

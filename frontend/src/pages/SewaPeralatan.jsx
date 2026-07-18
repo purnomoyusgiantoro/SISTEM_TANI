@@ -8,7 +8,7 @@ import { useApi, useMutation } from '../hooks/useApi';
 import { formatRupiah, formatTanggal } from '../utils/formatters';
 import StatusBadge from '../components/shared/StatusBadge';
 import Modal from '../components/shared/Modal';
-import { Info, Plus, Calendar, ShieldCheck, HelpCircle, Sprout, Wrench, Wind, Droplet, Hammer, Cpu } from 'lucide-react';
+import { Info, Plus, Calendar, ShieldCheck, HelpCircle, Sprout, Wrench, Wind, Droplet, Hammer, Cpu, RotateCcw } from 'lucide-react';
 import '../styles/pages/SewaPeralatan.css';
 
 const KATEGORI_PERALATAN = ['Pengolah Tanah', 'Penyemprotan', 'Panen', 'Irigasi', 'Perawatan', 'Teknologi'];
@@ -238,8 +238,10 @@ export default function SewaPeralatan() {
 
             <button 
               className="filter-btn" 
+              title="Reset Filter"
+              onClick={() => { setSelectedKategori('Semua'); setSearchQuery(''); }}
             >
-              <Wind size={16} />
+              <RotateCcw size={16} />
             </button>
 
             {currentUser?.role === 'pengurus' && (
@@ -540,6 +542,7 @@ export default function SewaPeralatan() {
                   value={newItemKategori}
                   onChange={(e) => setNewItemKategori(e.target.value)}
                   style={{ width: '100%' }}
+                >
                   {['Traktor', 'Mesin Air', 'Alat Tanam', 'Lainnya'].map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}

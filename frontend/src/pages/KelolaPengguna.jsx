@@ -28,13 +28,14 @@ export default function KelolaPengguna() {
   // Form State
   const [nama, setNama] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [role, setRole] = useState('petani');
   const [status, setStatus] = useState('aktif');
 
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
-      await createUser({ nama, email, role, status });
+      await createUser({ nama, email, password, role, status });
       toast.success('Pengguna berhasil ditambahkan');
       fetchUsers();
       setShowAddModal(false);
@@ -81,6 +82,7 @@ export default function KelolaPengguna() {
   const resetForm = () => {
     setNama('');
     setEmail('');
+    setPassword('');
     setRole('petani');
     setStatus('aktif');
   };
@@ -214,6 +216,18 @@ export default function KelolaPengguna() {
                 placeholder="pratama@simantan.id" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                style={{ width: '100%' }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', marginBottom: '6px' }}>Password (Kosongkan jika tidak diubah saat edit)</label>
+              <input 
+                type={selectedUser ? "password" : "text"} 
+                required={!selectedUser}
+                placeholder="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 style={{ width: '100%' }}
               />
             </div>

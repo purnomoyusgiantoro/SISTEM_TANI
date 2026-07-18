@@ -39,7 +39,19 @@ export default function AnalisisData() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button 
               style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 16px', background: 'var(--color-primary)', color: 'white', borderRadius: '8px', fontWeight: '600', fontSize: '0.85rem', height: '38px', boxSizing: 'border-box', cursor: 'pointer' }}
-              onClick={() => window.print()}
+              onClick={() => {
+                import('html2pdf.js').then((html2pdf) => {
+                  const element = document.querySelector('.admin-card');
+                  const opt = {
+                    margin: 0.5,
+                    filename: 'Laporan_Lahan.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                  };
+                  html2pdf.default().set(opt).from(element).save();
+                });
+              }}
             >
               <Download size={16} /> Cetak / Simpan PDF
             </button>

@@ -19,8 +19,9 @@ export default function LogAktivitas() {
 
   // Filter logs logic
   const filteredLogs = logs.filter(log => {
+    const userName = typeof log.user === 'object' ? (log.user?.nama || '') : (log.user || '');
     const matchSearch = searchQuery === '' || 
-      (log.user || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
+      userName.toLowerCase().includes(searchQuery.toLowerCase()) || 
       (log.aksi || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (log.detail || '').toLowerCase().includes(searchQuery.toLowerCase());
       
