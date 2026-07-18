@@ -10,7 +10,8 @@ import '../styles/pages/Kegiatan.css';
 
 import {
   Plus, Search, Filter, X, Calendar, ChevronLeft, ChevronRight,
-  Camera, FileText, Clock, Sprout, Droplet, Wind, Wheat, Hammer, Wrench, MapPin
+  Camera, FileText, Clock, Sprout, Droplet, Wind, Wheat, Hammer, Wrench, MapPin,
+  Edit, Trash2, AlertTriangle
 } from 'lucide-react';
 
 const JENIS_KEGIATAN = [
@@ -144,6 +145,8 @@ export default function Kegiatan() {
   const { data: kegiatanData, loading: loadingKegiatan, execute: fetchKegiatan } = useApi(kegiatanApi.getAll);
   const { data: lahanData, execute: fetchLahan } = useApi(lahanApi.getAll);
   const { mutate: createKegiatan, loading: creatingKegiatan } = useMutation(kegiatanApi.create);
+  const { mutate: updateKegiatan, loading: updatingKegiatan } = useMutation(kegiatanApi.update);
+  const { mutate: deleteKegiatan, loading: deletingKegiatan } = useMutation(kegiatanApi.delete);
 
   useEffect(() => {
     fetchKegiatan().catch(() => {});
@@ -153,6 +156,8 @@ export default function Kegiatan() {
   const kegiatan = Array.isArray(kegiatanData) ? kegiatanData : [];
 
   const [showModal, setShowModal] = useState(false);
+  const [editingItem, setEditingItem] = useState(null); // null = create mode, object = edit mode
+  const [showDeleteModal, setShowDeleteModal] = useState(null); // null or kegiatan object
   const [searchQuery, setSearchQuery] = useState('');
   const [filterJenis, setFilterJenis] = useState('');
   const [filterDateFrom, setFilterDateFrom] = useState('');
@@ -168,7 +173,7 @@ export default function Kegiatan() {
   /* ── filter ── */
   const filtered = useMemo(() => {
     let list = [...kegiatan];
-    if (role === 'petani') list = list.filter((k) => k.petaniId === currentUser?.id);
+    if (role === 'petani') list = list.filter((k) => k.petani_id === currentUser?.id || k.petaniId === currentUser?.id);
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       const getPetaniStr = (p) => typeof p === 'object' ? (p?.nama || '') : (p || '');
@@ -195,29 +200,79 @@ export default function Kegiatan() {
     return lahanList;
   }, [role, currentUser, lahanData]);
 
-  /* ── submit ── */
+  /* ── reset form ── */
+  const resetForm = () => {
+    setFormTanggal('');
+    setFormJenis('');
+    setFormLahan('');
+    setFormDeskripsi('');
+    setFormFoto(null);
+    setEditingItem(null);
+  };
+
+  /* ── open create modal ── */
+  const openCreateModal = () => {
+    resetForm();
+    setShowModal(true);
+  };
+
+  /* ── open edit modal ── */
+  const openEditModal = (item) => {
+    setEditingItem(item);
+    // Ensure date is in YYYY-MM-DD format for <input type="date">
+    const dateStr = item.tanggal ? item.tanggal.split(' ')[0].split('T')[0] : '';
+    setFormTanggal(dateStr);
+    setFormJenis(item.jenis || '');
+    setFormLahan(item.lahan_id || item.lahanId || '');
+    setFormDeskripsi(item.deskripsi || '');
+    setFormFoto(null);
+    setShowModal(true);
+  };
+
+  /* ── submit (create or edit) ── */
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const formData = new FormData();
-      formData.append('lahan_id', formLahan);
-      formData.append('jenis', formJenis);
-      formData.append('deskripsi', formDeskripsi);
-      formData.append('tanggal', formTanggal);
-      if (formFoto) formData.append('foto_file', formFoto);
+      if (editingItem) {
+        // EDIT mode
+        const formData = new FormData();
+        formData.append('jenis', formJenis);
+        formData.append('deskripsi', formDeskripsi);
+        formData.append('tanggal', formTanggal);
+        if (formFoto) formData.append('foto_file', formFoto);
 
-      await createKegiatan(formData);
-      toast.success('Kegiatan berhasil ditambahkan');
+        await updateKegiatan(editingItem.id, formData);
+        toast.success('Kegiatan berhasil diperbarui');
+      } else {
+        // CREATE mode
+        const formData = new FormData();
+        formData.append('lahan_id', formLahan);
+        formData.append('jenis', formJenis);
+        formData.append('deskripsi', formDeskripsi);
+        formData.append('tanggal', formTanggal);
+        if (formFoto) formData.append('foto_file', formFoto);
+
+        await createKegiatan(formData);
+        toast.success('Kegiatan berhasil ditambahkan');
+      }
       fetchKegiatan();
-      
       setShowModal(false);
-      setFormTanggal('');
-      setFormJenis('');
-      setFormLahan('');
-      setFormDeskripsi('');
-      setFormFoto(null);
+      resetForm();
     } catch (err) {
-      toast.error(err.message || 'Gagal menambahkan kegiatan');
+      toast.error(err.message || 'Gagal menyimpan kegiatan');
+    }
+  };
+
+  /* ── delete ── */
+  const handleDelete = async () => {
+    if (!showDeleteModal) return;
+    try {
+      await deleteKegiatan(showDeleteModal.id);
+      toast.success('Kegiatan berhasil dihapus');
+      fetchKegiatan();
+      setShowDeleteModal(null);
+    } catch (err) {
+      toast.error(err.message || 'Gagal menghapus kegiatan');
     }
   };
 
@@ -236,10 +291,11 @@ export default function Kegiatan() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {canAdd && (
               <button 
-                onClick={() => setShowModal(true)}
+                onClick={openCreateModal}
                 className="filter-btn filter-btn-primary"
+                style={{ cursor: 'pointer', zIndex: 10 }}
               >
-                <Plus size={16} /> Tambah Kegiatan
+                <Plus size={16} style={{ pointerEvents: 'none' }} /> Tambah Kegiatan
               </button>
             )}
             <nav style={{ marginBottom: 0, fontSize: '0.85rem', display: 'flex', alignItems: 'center', color: 'var(--color-primary)' }}>
@@ -346,15 +402,35 @@ export default function Kegiatan() {
                           <Clock size={14} color="var(--color-primary)" /> {formatTanggal(item.tanggal)}
                         </div>
                         
-                        {item.foto ? (
-                          <div style={{ marginTop: '4px', display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#f8fafc', border: '1px solid var(--color-border-light)', borderRadius: '6px', fontSize: '0.75rem', color: 'var(--color-primary-dark)', fontWeight: '600', alignSelf: 'flex-start' }}>
-                            <Camera size={14} /> {item.foto}
-                          </div>
-                        ) : (
-                          <div style={{ marginTop: '4px', display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#f8fafc', border: '1px dashed var(--color-border)', borderRadius: '6px', fontSize: '0.75rem', color: 'var(--color-text-muted)', alignSelf: 'flex-start' }}>
-                            <Camera size={14} /> Tanpa Foto
-                          </div>
-                        )}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          {item.foto ? (
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#f8fafc', border: '1px solid var(--color-border-light)', borderRadius: '6px', fontSize: '0.75rem', color: 'var(--color-primary-dark)', fontWeight: '600' }}>
+                              <Camera size={14} /> {item.foto}
+                            </div>
+                          ) : (
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#f8fafc', border: '1px dashed var(--color-border)', borderRadius: '6px', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+                              <Camera size={14} /> Tanpa Foto
+                            </div>
+                          )}
+                          {(role === 'petani' && (item.petani_id === currentUser?.id || item.petaniId === currentUser?.id)) && (
+                            <div style={{ display: 'flex', gap: '6px' }}>
+                              <button
+                                onClick={() => openEditModal(item)}
+                                style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #e2e8f0', background: '#f8fafc', color: '#3182ce', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', fontWeight: '600', position: 'relative', zIndex: 10 }}
+                                title="Edit Kegiatan"
+                              >
+                                <Edit size={13} style={{ pointerEvents: 'none' }} /> Edit
+                              </button>
+                              <button
+                                onClick={() => setShowDeleteModal(item)}
+                                style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #fed7d7', background: '#fff5f5', color: '#e53e3e', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', fontWeight: '600', position: 'relative', zIndex: 10 }}
+                                title="Hapus Kegiatan"
+                              >
+                                <Trash2 size={13} style={{ pointerEvents: 'none' }} /> Hapus
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -365,8 +441,8 @@ export default function Kegiatan() {
 
         </div>
 
-        {/* ── Modal: Tambah Kegiatan ── */}
-        <Modal open={showModal} onClose={() => setShowModal(false)} title="Tambah Kegiatan Baru">
+        {/* ── Modal: Tambah / Edit Kegiatan ── */}
+        <Modal open={showModal} onClose={() => { setShowModal(false); resetForm(); }} title={editingItem ? 'Edit Kegiatan' : 'Tambah Kegiatan Baru'}>
           <form onSubmit={handleSubmit}>
             <div className="kegiatan-form-group">
               <label>Tanggal</label>
@@ -388,17 +464,19 @@ export default function Kegiatan() {
               </select>
             </div>
 
-            <div className="kegiatan-form-group">
-              <label>Lahan</label>
-              <select value={formLahan} onChange={(e) => setFormLahan(e.target.value)} required>
-                <option value="">-- Pilih lahan --</option>
-                {userLahan.map((l, idx) => (
-                  <option key={l?.id || idx} value={l?.id || ''}>
-                    {l?.lokasi} ({l?.luas} Ha — {l?.jenis_lahan || l?.jenisLahan})
-                  </option>
-                ))}
-              </select>
-            </div>
+            {!editingItem && (
+              <div className="kegiatan-form-group">
+                <label>Lahan</label>
+                <select value={formLahan} onChange={(e) => setFormLahan(e.target.value)} required>
+                  <option value="">-- Pilih lahan --</option>
+                  {userLahan.map((l, idx) => (
+                    <option key={l?.id || idx} value={l?.id || ''}>
+                      {l?.lokasi} ({l?.luas} Ha — {l?.jenis_lahan || l?.jenisLahan})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="kegiatan-form-group">
               <label>Deskripsi</label>
@@ -434,15 +512,42 @@ export default function Kegiatan() {
               <button
                 type="button"
                 className="kegiatan-btn kegiatan-btn-outline"
-                onClick={() => setShowModal(false)}
+                onClick={() => { setShowModal(false); resetForm(); }}
               >
                 Batal
               </button>
-              <button type="submit" className="kegiatan-btn kegiatan-btn-primary">
-                <Plus size={14} /> Simpan Kegiatan
+              <button type="submit" className="kegiatan-btn kegiatan-btn-primary" disabled={creatingKegiatan || updatingKegiatan}>
+                {editingItem ? <><Edit size={14} /> Simpan Perubahan</> : <><Plus size={14} /> Simpan Kegiatan</>}
               </button>
             </div>
           </form>
+        </Modal>
+
+        {/* ── Modal: Konfirmasi Hapus ── */}
+        <Modal open={!!showDeleteModal} onClose={() => setShowDeleteModal(null)} title="Konfirmasi Hapus">
+          <div style={{ textAlign: 'center', padding: '16px 0' }}>
+            <AlertTriangle size={48} color="#e53e3e" style={{ marginBottom: '12px' }} />
+            <p style={{ fontSize: '1rem', fontWeight: '600', color: '#333', marginBottom: '8px' }}>Hapus Kegiatan Ini?</p>
+            <p style={{ fontSize: '0.875rem', color: '#718096' }}>Data kegiatan yang sudah dihapus tidak bisa dikembalikan.</p>
+          </div>
+          <div className="kegiatan-form-actions">
+            <button
+              type="button"
+              className="kegiatan-btn kegiatan-btn-outline"
+              onClick={() => setShowDeleteModal(null)}
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              className="kegiatan-btn"
+              style={{ background: '#e53e3e', color: 'white' }}
+              onClick={handleDelete}
+              disabled={deletingKegiatan}
+            >
+              <Trash2 size={14} /> {deletingKegiatan ? 'Menghapus...' : 'Ya, Hapus'}
+            </button>
+          </div>
         </Modal>
         </div>
       </div>

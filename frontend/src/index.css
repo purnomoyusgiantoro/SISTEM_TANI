@@ -122,7 +122,7 @@
   --z-overlay: 400;
   --z-modal: 500;
   --z-tooltip: 600;
-  --z-toast: 700;
+  --z-toast: 9999;
 }
 
 /* ---------- Reset / Normalize ---------- */

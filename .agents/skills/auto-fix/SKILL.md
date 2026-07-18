@@ -40,10 +40,13 @@ Gunakan `browser_subagent` untuk mensimulasikan pengujian langsung seperti seora
 - **Test Database & API (Backend Validation):**
   - Lakukan *test API* secara langsung menggunakan perintah terminal (`curl` atau *script node/php*) untuk memastikan semua endpoint merespon dengan benar tanpa error 500.
   - Validasi *database*: Pastikan data yang diinput melalui UI benar-benar tersimpan di tabel *database* yang sesuai dengan relasi yang benar (tidak ada data *orphan* atau *foreign key error*). Uji semua fungsionalitas ini secara rinci sampai ke akar-akarnya.
-- **Test Kegiatan Pertanian (CRUD Lengkap):**
-  - Tambah kegiatan baru (isi semua field: nama, tanggal mulai/selesai, deskripsi, jenis kegiatan). Pastikan data tersimpan.
-  - Edit kegiatan yang sudah ada, ubah tanggal dan deskripsinya, lalu simpan. Pastikan perubahan tersimpan.
-  - Hapus kegiatan dan pastikan data terhapus dari tabel (tidak muncul lagi di list).
+- **Test Kegiatan Pertanian (CRUD Lengkap + Validasi Database):**
+  - **CREATE:** Login sebagai Petani → buka halaman Kegiatan → klik tombol "Tambah Kegiatan" → isi semua field (nama kegiatan: "Penyuluhan Tanaman Padi", tanggal mulai, tanggal selesai, deskripsi, jenis kegiatan) → klik Simpan → pastikan toast sukses muncul dan data tampil di tabel.
+  - **Validasi DB setelah CREATE:** Jalankan query database (`php artisan tinker` atau script PHP) untuk memastikan record baru benar-benar tersimpan di tabel `kegiatans` dengan semua kolom terisi sesuai input.
+  - **EDIT:** Klik tombol Edit pada kegiatan yang baru dibuat → ubah nama menjadi "Penyuluhan Tanaman Padi (Revisi)" dan ubah deskripsinya → klik Simpan → pastikan toast sukses muncul dan data di tabel berubah.
+  - **Validasi DB setelah EDIT:** Jalankan query database untuk memastikan record ter-update di tabel `kegiatans` (nama dan deskripsi berubah, `updated_at` ter-update).
+  - **DELETE:** Klik tombol Hapus pada kegiatan tersebut → konfirmasi dialog hapus → pastikan data hilang dari tabel.
+  - **Validasi DB setelah DELETE:** Jalankan query database untuk memastikan record sudah tidak ada di tabel `kegiatans` (atau ter-soft-delete jika menggunakan SoftDeletes).
   - Test filter kegiatan berdasarkan tanggal dan jenis. Pastikan hasilnya sesuai.
 - **Test Sewa Peralatan (Alur Lengkap End-to-End):**
   - Login sebagai **Petani** → buka Katalog Alat → pilih alat → klik "Ajukan Sewa" → isi tanggal mulai & selesai → pastikan kalkulasi biaya otomatis benar → kirim pengajuan.
@@ -96,11 +99,19 @@ Gunakan `browser_subagent` untuk mensimulasikan pengujian langsung seperti seora
   - Test logout → pastikan token dihapus dan redirect ke halaman login.
   - Pastikan password tidak pernah ditampilkan di UI atau dikirim kembali dalam response API.
 
-## 4. 🔄 Evaluasi & Ulangi (Loop)
-- **Validasi:** Apakah masih ada error? Apakah ada fitur yang tidak bisa ditekan? Apakah alur kerja melanggar aturan di PRD?
-- **Repeat:** Jika *IYA* (masih ada error/ketidaksesuaian), **KEMBALI KE LANGKAH 1**. Perbaiki masalah yang baru ditemukan dan lakukan *testing* lagi.
+## 4. 🔧 ATURAN PENTING: PERBAIKI LANGSUNG, LALU LANJUT (Fix-Immediately Loop)
+- **Setiap kali ditemukan bug atau error** selama pengujian, kamu **WAJIB LANGSUNG MEMPERBAIKINYA** saat itu juga. Jangan menumpuk daftar bug untuk diperbaiki nanti.
+- **Alur wajib:** Test → Temukan Bug → **Langsung Perbaiki** → Test Ulang Bagian Yang Diperbaiki → Lanjut ke Test Berikutnya.
+- **Perbaikan Tampilan (UI Symmetry):** Jika selama pengujian ditemukan tampilan yang **tidak simetris**, tidak rapi, spacing tidak konsisten, elemen tidak sejajar, font size tidak seragam, atau warna tidak harmonis, kamu **WAJIB langsung memperbaikinya** juga. Jangan abaikan masalah visual.
+- Jangan pernah melewati sebuah bug dan melanjutkan ke test lain. Perbaiki dulu, pastikan beres, baru lanjut.
+- **Loop ini berjalan terus-menerus** sampai SELURUH skenario di atas lulus 100% tanpa satu pun error atau masalah tampilan.
+
+## 5. 🔄 Evaluasi & Ulangi (Loop)
+- **Validasi:** Apakah masih ada error? Apakah ada fitur yang tidak bisa ditekan? Apakah alur kerja melanggar aturan di PRD? Apakah ada tampilan yang tidak simetris/rapi?
+- **Repeat:** Jika *IYA* (masih ada error/ketidaksesuaian/tampilan buruk), **KEMBALI KE LANGKAH 1**. Perbaiki masalah yang baru ditemukan dan lakukan *testing* lagi.
 - Jangan berhenti mencoba sampai seluruh skenario pengujian di atas berjalan 100% mulus.
 
-## 5. 📋 Laporan Akhir (Walkthrough)
+## 6. 📋 Laporan Akhir (Walkthrough)
 Jika sistem sudah terverifikasi bersih dari *error*, buatkan sebuah *artifact* `walkthrough.md`.
 Laporan ini harus memuat rangkuman perbaikan yang dilakukan dan hasil rekaman tes dari sub-agen browser, lalu beri tahu pengguna bahwa sistem siap digunakan.
+
