@@ -1,117 +1,168 @@
 ---
 name: auto-fix
-description: Mode otonom tingkat lanjut untuk membaca sistem, mencocokkan dengan PRD, menemukan error, memperbaiki, dan melakukan E2E testing secara berulang (QA Automation).
+description: Mode otonom visual-first — melihat setiap halaman, mendeteksi anomali tampilan & fungsional, lalu memperbaiki langsung sebelum lanjut.
 ---
 
-# 🚀 Instruksi Skill: Auto-Fix (Advanced QA & Repair Mode)
+# 🔍 Instruksi Skill: Auto-Fix (Visual Anomaly Detection & Repair)
 
-Saat skill ini dipanggil, kamu (AI) diinstruksikan untuk menjalankan **siklus pengujian dan perbaikan otonom** (End-to-End QA) tanpa henti sampai sistem dinyatakan 100% bebas dari *error* dan sesuai dengan spesifikasi PRD. 
+Saat skill ini dipanggil, kamu (AI) bertindak sebagai **inspektur visual otonom**. Kamu membuka setiap halaman, **melihat tampilannya** (screenshot), mendeteksi **anomali** (visual maupun fungsional), lalu **langsung memperbaiki** sebelum berpindah ke halaman berikutnya.
 
-Jalankan langkah-langkah berikut secara berurutan:
+> **Prinsip utama:** Lihat → Deteksi Anomali → Perbaiki → Lihat Lagi → Lanjut.
 
-## 1. 📖 Analisis Sistem & Sinkronisasi PRD
-- **Baca Spesifikasi Dasar:** Buka dan pahami spesifikasi dari file `PRD_Backend_RuangTani.md` dan `PRD_Frontend_RuangTani.md`.
-- **Cek Status Sistem:** Periksa *terminal logs* (contoh: log Laravel, Vite console) untuk mendeteksi error yang sedang berjalan (seperti *500 Internal Server Error* atau *React Error Boundary*).
-- **Analisis Kesenjangan (Gap Analysis):** Analisis *stack trace* atau struktur UI saat ini, lalu cocokkan dengan *requirement* di PRD. Identifikasi fitur yang belum berfungsi atau tidak sesuai.
+---
 
-## 2. 🛠️ Perbaikan Sistem (Frontend & Backend)
-- **Cari Akar Masalah:** Gunakan *grep_search* atau pencarian file untuk menemukan letak *bug*.
-- **Modifikasi Kode:** Buat perbaikan di backend (Controller, Model, Database) maupun frontend (React Component, Context, API client) menggunakan alat modifikasi file (`replace_file_content` atau `multi_replace_file_content`).
-- Pastikan kode yang ditulis menerapkan standar keamanan (menghindari dereferensi null, optional chaining, *exception handling*).
+## 1. 🏗️ Persiapan
 
-## 3. 🧪 Pengujian End-to-End (E2E Testing Otomatis)
-Gunakan `browser_subagent` untuk mensimulasikan pengujian langsung seperti seorang *Quality Assurance (QA)*. Kamu wajib melakukan pengujian komprehensif berikut:
-- **Test Semua Role:** Login secara bergiliran menggunakan akun dari semua *role* (Petani, Pengurus, BPP, Admin).
-- **Test Navigasi:** Kunjungi setiap menu dan submenu di Sidebar. Pastikan setiap halaman termuat sempurna tanpa *crash*.
-- **Test CRUD (Create, Read, Update, Delete):**
-  - **Input Data:** Isi formulir, tes upload file (jika ada), dan kirim data.
-  - **Update Data:** Klik tombol edit, ubah data, lalu simpan.
-  - **Hapus Data:** Tes tombol hapus dan konfirmasi dialog.
-- **Test Interaksi UI:** Klik tombol filter, ganti input tanggal, coba fitur pencarian (*search*), dan buka *modal/dialog* yang ada.
-**Test Interaksi AI:** test juga semua apinya dengan benar dan pastikan tidak ada error
-- **Test Elemen Interaktif & Placeholder:** Secara khusus, periksa setiap elemen UI seperti tombol "Unduh PDF", pemilih tanggal (Date Picker), tombol aksi tabel, dan tombol *export/import*. Banyak elemen mungkin hanya tampilan (template) dan belum berfungsi. Jika ditemukan elemen yang tidak merespon saat di-klik atau *error* fungsi di belakangnya, kamu WAJIB menganalisis, memperbaiki *handler* (seperti `onClick`), menyambungkan ke API, atau mengimplementasikan logika fungsionalnya hingga benar-benar dapat beroperasi. Jangan abaikan elemen yang tampak mati.
-- **Test Skenario Spesifik & Fungsionalitas Lengkap (Sangat Rinci):**
-  - **Kelola Berita/Artikel:** Test fitur menambahkan artikel berita, edit, dan hapus. Pastikan artikel baru muncul di halaman publik/dashboard.
-  - **Kelola Pengguna (Akun):** Test fitur penambahan akun baru (Petani/BPP/Pengurus). 
-  - **Uji Login Akun Baru:** *Wajib* mencoba logout, kemudian login kembali menggunakan akun baru yang baru saja ditambahkan di langkah sebelumnya.
-  - **Verifikasi Lahan:** Test siklus pengajuan lahan oleh Petani, lalu ubah dan lakukan proses verifikasi (Terima/Tolak) oleh BPP/Pengurus. Pastikan statusnya berubah dan datanya sinkron.
-  - **Pembayaran (Test Bayar):** Test siklus penyewaan atau pembayaran dari awal hingga akhir. Cek simulasi unggah bukti bayar dan verifikasi status pembayarannya.
-  - **Profil dan Pengaturan:** Test pengubahan data profil (nama, password, dll) dan pastikan perubahannya tersimpan permanen.
-- **Test Database & API (Backend Validation):**
-  - Lakukan *test API* secara langsung menggunakan perintah terminal (`curl` atau *script node/php*) untuk memastikan semua endpoint merespon dengan benar tanpa error 500.
-  - Validasi *database*: Pastikan data yang diinput melalui UI benar-benar tersimpan di tabel *database* yang sesuai dengan relasi yang benar (tidak ada data *orphan* atau *foreign key error*). Uji semua fungsionalitas ini secara rinci sampai ke akar-akarnya.
-- **Test Kegiatan Pertanian (CRUD Lengkap + Validasi Database):**
-  - **CREATE:** Login sebagai Petani → buka halaman Kegiatan → klik tombol "Tambah Kegiatan" → isi semua field (nama kegiatan: "Penyuluhan Tanaman Padi", tanggal mulai, tanggal selesai, deskripsi, jenis kegiatan) → klik Simpan → pastikan toast sukses muncul dan data tampil di tabel.
-  - **Validasi DB setelah CREATE:** Jalankan query database (`php artisan tinker` atau script PHP) untuk memastikan record baru benar-benar tersimpan di tabel `kegiatans` dengan semua kolom terisi sesuai input.
-  - **EDIT:** Klik tombol Edit pada kegiatan yang baru dibuat → ubah nama menjadi "Penyuluhan Tanaman Padi (Revisi)" dan ubah deskripsinya → klik Simpan → pastikan toast sukses muncul dan data di tabel berubah.
-  - **Validasi DB setelah EDIT:** Jalankan query database untuk memastikan record ter-update di tabel `kegiatans` (nama dan deskripsi berubah, `updated_at` ter-update).
-  - **DELETE:** Klik tombol Hapus pada kegiatan tersebut → konfirmasi dialog hapus → pastikan data hilang dari tabel.
-  - **Validasi DB setelah DELETE:** Jalankan query database untuk memastikan record sudah tidak ada di tabel `kegiatans` (atau ter-soft-delete jika menggunakan SoftDeletes).
-  - Test filter kegiatan berdasarkan tanggal dan jenis. Pastikan hasilnya sesuai.
-- **Test Sewa Peralatan (Alur Lengkap End-to-End):**
-  - Login sebagai **Petani** → buka Katalog Alat → pilih alat → klik "Ajukan Sewa" → isi tanggal mulai & selesai → pastikan kalkulasi biaya otomatis benar → kirim pengajuan.
-  - Login sebagai **Pengurus** → buka tab "Validasi & Riwayat Sewa" → temukan pengajuan tadi → klik "Setujui" → pastikan status berubah ke "Disetujui".
-  - Uji juga skenario **penolakan**: Ajukan sewa lain, lalu tolak sebagai Pengurus. Pastikan status berubah ke "Ditolak".
-  - Pastikan stok peralatan berkurang setelah disetujui dan kembali jika ditolak.
-- **Test Notifikasi:**
-  - Pastikan setiap aksi penting (sewa disetujui, lahan diverifikasi, pembayaran dikonfirmasi) menghasilkan notifikasi.
-  - Buka panel notifikasi dan pastikan daftar notifikasi termuat tanpa error.
-  - Test tandai notifikasi sebagai sudah dibaca.
-- **Test Backup Data:**
-  - Buka halaman Backup Data (hanya Admin). Pastikan halaman termuat tanpa crash.
-  - Test tombol buat backup baru. Pastikan proses berjalan dan file backup tercatat di daftar.
-  - Test tombol download/restore backup jika tersedia.
-- **Test Struktur Organisasi:**
-  - Buka halaman Struktur Organisasi. Pastikan data organisasi tampil dengan benar.
-  - Test fitur tambah/edit anggota organisasi (jika tersedia). Pastikan perubahan tersimpan.
-- **Test Landing Page (Halaman Publik):**
-  - Akses halaman utama tanpa login (`/`). Pastikan halaman termuat sempurna.
-  - Pastikan tombol "Login" dan navigasi ke halaman login berfungsi.
-  - Pastikan informasi berita/artikel publik tampil dengan benar di landing page.
-- **Test Otorisasi & Akses Role (Role-Based Access Control):**
-  - Login sebagai **Petani** → pastikan menu yang muncul di sidebar hanya menu yang relevan (Dashboard, Data Lahan, Sewa Peralatan, Kegiatan, Berita).
-  - Login sebagai **Pengurus** → pastikan ada menu tambahan (Verifikasi Lahan, Validasi Sewa).
-  - Login sebagai **BPP** → pastikan menu verifikasi dan monitoring tersedia.
-  - Login sebagai **Admin** → pastikan semua menu tersedia termasuk Kelola Pengguna, Backup Data, Log Aktivitas.
-  - **Test akses ilegal:** Coba akses URL halaman admin (`/kelola-pengguna`, `/backup-data`, `/log-aktivitas`) saat login sebagai Petani. Pastikan ditolak/redirect.
-- **Test Validasi Form (Input Validation):**
-  - Kirim formulir tanpa mengisi field wajib → pastikan muncul pesan error/validasi.
-  - Isi field angka (luas lahan, harga) dengan huruf → pastikan validasi menolak.
-  - Isi email dengan format salah pada form pengguna → pastikan validasi bekerja.
-  - Test batas karakter (input sangat panjang) → pastikan tidak crash.
-  - Test input tanggal selesai lebih awal dari tanggal mulai → pastikan ditolak.
-- **Test Responsive UI & Tampilan Mobile:**
-  - Resize browser ke ukuran kecil (360x640 mobile). Navigasi semua halaman dan pastikan tidak ada elemen yang tumpang tindih (*overflow*) atau hilang.
-  - Pastikan sidebar collapse/hamburger menu berfungsi di tampilan mobile.
-  - Pastikan tabel-tabel bisa di-scroll horizontal tanpa merusak layout.
-- **Test Error Handling & Edge Cases:**
-  - Matikan/blokir koneksi API (mock error) → pastikan muncul pesan error yang ramah pengguna, bukan layar putih/*crash*.
-  - Akses halaman yang tidak ada (`/halaman-tidak-ada`) → pastikan ada halaman 404 atau redirect yang benar.
-  - Double-click tombol submit → pastikan data tidak terkirim dua kali (*prevent double submission*).
-  - Test halaman dengan data kosong (belum ada data) → pastikan muncul tampilan *empty state* yang informatif, bukan error.
-- **Test Pagination & Pencarian Data Besar:**
-  - Jika ada pagination di tabel (Data Lahan, Riwayat Sewa, Log Aktivitas), test navigasi antar halaman (next/prev/nomor halaman).
-  - Test pencarian → ketik query → pastikan hasil terfilter real-time dan pagination ter-reset ke halaman 1.
-  - Test reset filter → pastikan data kembali ke tampilan awal.
-- **Test Keamanan (Security Testing):**
-  - Pastikan token autentikasi (Bearer Token) tersimpan aman di *localStorage/cookie* dan dikirim di setiap request API.
-  - Test akses API tanpa token → pastikan respons `401 Unauthorized`.
-  - Test logout → pastikan token dihapus dan redirect ke halaman login.
-  - Pastikan password tidak pernah ditampilkan di UI atau dikirim kembali dalam response API.
+1. Baca `PRD_Backend_RuangTani.md` dan `PRD_Frontend_RuangTani.md` untuk memahami spesifikasi.
+2. Pastikan backend (`php artisan serve`) dan frontend (`npm run dev`) berjalan.
+3. Baca file `database/seeders/UserSeeder.php` untuk mendapatkan akun login tiap role.
 
-## 4. 🔧 ATURAN PENTING: PERBAIKI LANGSUNG, LALU LANJUT (Fix-Immediately Loop)
-- **Setiap kali ditemukan bug atau error** selama pengujian, kamu **WAJIB LANGSUNG MEMPERBAIKINYA** saat itu juga. Jangan menumpuk daftar bug untuk diperbaiki nanti.
-- **Alur wajib:** Test → Temukan Bug → **Langsung Perbaiki** → Test Ulang Bagian Yang Diperbaiki → Lanjut ke Test Berikutnya.
-- **Perbaikan Tampilan (UI Symmetry):** Jika selama pengujian ditemukan tampilan yang **tidak simetris**, tidak rapi, spacing tidak konsisten, elemen tidak sejajar, font size tidak seragam, atau warna tidak harmonis, kamu **WAJIB langsung memperbaikinya** juga. Jangan abaikan masalah visual.
-- Jangan pernah melewati sebuah bug dan melanjutkan ke test lain. Perbaiki dulu, pastikan beres, baru lanjut.
-- **Loop ini berjalan terus-menerus** sampai SELURUH skenario di atas lulus 100% tanpa satu pun error atau masalah tampilan.
+---
 
-## 5. 🔄 Evaluasi & Ulangi (Loop)
-- **Validasi:** Apakah masih ada error? Apakah ada fitur yang tidak bisa ditekan? Apakah alur kerja melanggar aturan di PRD? Apakah ada tampilan yang tidak simetris/rapi?
-- **Repeat:** Jika *IYA* (masih ada error/ketidaksesuaian/tampilan buruk), **KEMBALI KE LANGKAH 1**. Perbaiki masalah yang baru ditemukan dan lakukan *testing* lagi.
-- Jangan berhenti mencoba sampai seluruh skenario pengujian di atas berjalan 100% mulus.
+## 2. 👁️ Siklus Inspeksi Visual (Visual Patrol)
 
-## 6. 📋 Laporan Akhir (Walkthrough)
-Jika sistem sudah terverifikasi bersih dari *error*, buatkan sebuah *artifact* `walkthrough.md`.
-Laporan ini harus memuat rangkuman perbaikan yang dilakukan dan hasil rekaman tes dari sub-agen browser, lalu beri tahu pengguna bahwa sistem siap digunakan.
+Gunakan `browser_subagent` untuk **membuka setiap halaman satu per satu** dan ambil **screenshot**. Untuk setiap screenshot, analisis dengan checklist anomali berikut:
 
+### Checklist Anomali Visual (apa yang kamu CARI di setiap screenshot)
+
+| Kategori | Anomali yang Dicari |
+|---|---|
+| **Layout Rusak** | Elemen bertumpuk (*overlap*), melebihi layar (*overflow*), kolom tidak sejajar, spacing tidak konsisten |
+| **Elemen Hilang** | Tombol, ikon, tabel, card, atau teks yang seharusnya ada tapi tidak muncul |
+| **Teks Aneh** | Placeholder mentah (lorem ipsum, `undefined`, `null`, `NaN`, `[object Object]`), teks terpotong, bahasa campur tanpa alasan |
+| **Warna Salah** | Badge/status warna tidak sesuai konteks (misal status "Ditolak" berwarna hijau), kontras terlalu rendah |
+| **Ukuran Salah** | Font terlalu kecil/besar, tombol terlalu kecil untuk diklik, gambar terdistorsi |
+| **Halaman Blank/Crash** | Halaman kosong putih, error boundary React, pesan error merah di layar |
+| **Loading Tanpa Akhir** | Spinner berputar terus tanpa data muncul |
+| **Tabel Kosong Tanpa Feedback** | Tabel tanpa data tapi tidak ada pesan *empty state* |
+| **Modal/Dialog Rusak** | Modal tidak bisa ditutup, posisi di luar layar, background overlay tidak muncul |
+| **Responsif** | Di layar kecil: sidebar menutupi konten, tombol keluar viewport, tabel tidak bisa di-scroll |
+
+### Halaman yang WAJIB Diinspeksi
+
+Untuk **setiap role** (Petani, Pengurus, BPP, Admin), login dan kunjungi **semua halaman** yang bisa diakses role tersebut:
+
+**Akun Login:**
+- Petani: `budi@ruangtani.id` / `password`
+- Pengurus: `ahmad@ruangtani.id` / `password`
+- BPP: `hendra@ruangtani.id` / `password`
+- Admin: `admin@ruangtani.id` / `password`
+
+**Daftar Halaman per Role:**
+
+| Halaman | Petani | Pengurus | BPP | Admin |
+|---|:---:|:---:|:---:|:---:|
+| Landing Page (`/`) | ✅ | ✅ | ✅ | ✅ |
+| Login (`/login`) | ✅ | ✅ | ✅ | ✅ |
+| Dashboard (`/dashboard`) | ✅ | ✅ | ✅ | ✅ |
+| Data Lahan (`/data-lahan`) | ✅ | ✅ | ✅ | — |
+| Sewa Peralatan (`/sewa-peralatan`) | ✅ | ✅ | — | — |
+| Pembayaran (`/pembayaran`) | ✅ | ✅ | — | — |
+| Kegiatan (`/kegiatan`) | ✅ | ✅ | — | — |
+| Struktur Organisasi (`/struktur-organisasi`) | ✅ | ✅ | ✅ | — |
+| Berita (`/berita`) | ✅ | ✅ | — | — |
+| Verifikasi Lahan (`/verifikasi-lahan`) | — | — | ✅ | — |
+| Kelola Berita (`/kelola-berita`) | — | — | ✅ | — |
+| Analisis Data (`/analisis-data`) | — | — | ✅ | — |
+| Kelola Pengguna (`/kelola-pengguna`) | — | — | — | ✅ |
+| Log Aktivitas (`/log-aktivitas`) | — | — | — | ✅ |
+| Backup Data (`/backup-data`) | — | — | — | ✅ |
+
+---
+
+## 3. 🔨 Alur per Halaman (Wajib Diikuti)
+
+Untuk **setiap halaman** di daftar di atas, lakukan langkah ini **secara berurutan**:
+
+### 3.1. Lihat & Screenshot
+- Buka halaman menggunakan `browser_subagent`.
+- **Screenshot** halaman.
+- Analisis screenshot: apakah ada anomali dari checklist di atas?
+
+### 3.2. Deteksi Anomali
+- Jika **ada anomali visual** (layout rusak, teks aneh, elemen hilang, warna salah, dll):
+  - Catat anomalinya.
+  - **HENTIKAN inspeksi sementara.**
+  - Cari penyebab di source code (gunakan `grep_search`, `view_file`).
+  - **Perbaiki langsung** menggunakan `replace_file_content` atau `multi_replace_file_content`.
+  - Kembali ke browser → **reload halaman** → **screenshot ulang** → pastikan anomali sudah hilang.
+  - Jika masih ada anomali lain, ulangi.
+
+### 3.3. Test Interaksi
+Setelah tampilan bersih, **klik semua elemen interaktif** di halaman tersebut:
+- Tombol (Tambah, Edit, Hapus, Filter, Export, dll)
+- Modal/dialog — pastikan bisa dibuka DAN ditutup
+- Form — isi dan submit, pastikan toast sukses/error muncul
+- Dropdown/select — pastikan opsi termuat
+- Pagination — klik next/prev
+- Search — ketik query, pastikan filter bekerja
+
+Jika ada tombol yang **tidak merespon** (tombol mati/placeholder), kamu **WAJIB** mengimplementasikan handler-nya atau menyambungkan ke API yang benar.
+
+### 3.4. Verifikasi Backend
+Setelah submit form atau aksi CRUD:
+- Jalankan `php artisan tinker` atau script PHP untuk **cek database** — pastikan data benar-benar tersimpan/terupdate/terhapus.
+- Jika data tidak sinkron, perbaiki backend (Controller/Model) lalu test ulang.
+
+### 3.5. Tandai Selesai, Lanjut
+Jika halaman sudah bersih (tidak ada anomali visual, semua tombol berfungsi, data sinkron), lanjut ke halaman berikutnya.
+
+---
+
+## 4. 🔄 Aturan Inti: Fix-On-Sight
+
+> **Kamu TIDAK BOLEH melewati anomali.** Jika kamu melihat sesuatu yang aneh — perbaiki SEKARANG.
+
+- ❌ Jangan buat daftar bug untuk nanti.
+- ❌ Jangan skip halaman yang bermasalah.
+- ❌ Jangan abaikan masalah "kecil" (misal spacing 2px yang tidak konsisten).
+- ✅ Lihat → Perbaiki → Lihat lagi → Baru lanjut.
+
+**Contoh anomali yang harus langsung diperbaiki:**
+- Card dashboard memiliki tinggi yang tidak seragam → perbaiki CSS.
+- Tombol "Unduh PDF" tidak merespon klik → implementasikan onClick handler.
+- Tabel menampilkan `undefined` di kolom nama → perbaiki data mapping di komponen.
+- Modal edit muncul tapi field kosong (data tidak ter-populate) → perbaiki state/prop passing.
+- Halaman `/pembayaran` blank setelah upload bukti → perbaiki error handling di API call.
+- Sidebar di mobile menutupi konten → perbaiki z-index dan overlay.
+- Status badge "Ditolak" berwarna hijau → perbaiki logic warna di StatusBadge component.
+
+---
+
+## 5. 📱 Inspeksi Responsif (Wajib)
+
+Setelah semua halaman diinspeksi di ukuran desktop, **ulangi untuk ukuran mobile** (360x640):
+- Resize browser ke 360x640.
+- Kunjungi **minimal 5 halaman utama** (Landing, Login, Dashboard, Data Lahan, Sewa).
+- Cek anomali: elemen tumpang tindih, teks terpotong, tombol keluar viewport.
+- Pastikan hamburger menu / sidebar toggle berfungsi.
+
+---
+
+## 6. 🧪 Test API Backend (Terminal)
+
+Setelah inspeksi visual selesai, lakukan test API langsung dari terminal:
+- Gunakan `curl` atau script PHP untuk test **setiap endpoint** di `routes/api.php`.
+- Pastikan semua endpoint merespon dengan status code yang benar (200, 201, 401, 403, 422).
+- Khususnya test:
+  - Login (`POST /api/v1/auth/login`) → pastikan dapat token.
+  - Endpoint tanpa token → pastikan `401 Unauthorized`.
+  - CRUD endpoint → pastikan data tersimpan/terupdate/terhapus di database.
+
+---
+
+## 7. 🔁 Loop Ulang (Jika Masih Ada Masalah)
+
+Setelah semua halaman diinspeksi:
+1. **Evaluasi:** Apakah ada halaman yang kamu perbaiki?
+2. Jika **YA** → Kembali ke halaman-halaman yang diperbaiki, **inspeksi ulang** untuk memastikan perbaikan tidak merusak hal lain.
+3. Ulangi sampai **satu putaran penuh tanpa menemukan anomali baru**.
+
+---
+
+## 8. 📋 Laporan Akhir
+
+Setelah sistem dinyatakan bersih, buat artifact `walkthrough.md` berisi:
+- Daftar semua anomali yang ditemukan dan diperbaiki (dengan file & baris yang diubah).
+- Screenshot sebelum/sesudah perbaikan (jika tersedia dari rekaman browser).
+- Konfirmasi bahwa sistem siap digunakan.

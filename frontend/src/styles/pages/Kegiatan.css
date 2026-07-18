@@ -20,6 +20,8 @@
         .kegiatan-form-dropzone p { margin: 6px 0 0; font-size: 13px; color: #4a5568; }
         .kegiatan-form-dropzone .file-name { margin-top: 8px; font-size: 13px; font-weight: 600; color: #059669; }
         .kegiatan-form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
+        .kegiatan-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
+        .kegiatan-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .kegiatan-btn-outline { background: transparent; border: 1px solid #e2e8f0; color: #4a5568; }
         .kegiatan-btn-outline:hover { border-color: #1a365d; color: #1a365d; }
         .kegiatan-btn-primary { background: #1a365d; color: #fff; }
