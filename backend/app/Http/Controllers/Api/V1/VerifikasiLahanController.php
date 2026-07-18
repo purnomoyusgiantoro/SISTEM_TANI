@@ -13,11 +13,16 @@ class VerifikasiLahanController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Lahan::with(['pemilik:id,nama,email'])
-            ->where('status_verifikasi', 'pending')
-            ->orderBy('tanggal_daftar', 'asc');
+        $query = Lahan::with(['pemilik:id,nama,email', 'verifikator:id,nama']);
 
-        $lahan = $query->paginate($request->input('per_page', 15));
+        // Allow filtering by status, but default to all statuses
+        if ($request->filled('status')) {
+            $query->where('status_verifikasi', $request->status);
+        }
+
+        $query->orderBy('tanggal_daftar', 'asc');
+
+        $lahan = $query->paginate($request->input('per_page', 100));
 
         return response()->json([
             'status' => 'success',

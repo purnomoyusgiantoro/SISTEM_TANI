@@ -13,10 +13,23 @@ import {
   MapPin, User, Calendar, Layers, FileText, Search
 } from 'lucide-react';
 
-
+// Normalize lahan data to handle both snake_case and camelCase
+function normalizeLahan(l) {
+  return {
+    ...l,
+    statusVerifikasi: l.status_verifikasi || l.statusVerifikasi || 'pending',
+    jenisLahan: l.jenis_lahan || l.jenisLahan || '-',
+    tanggalDaftar: l.tanggal_daftar || l.tanggalDaftar || '',
+    pemilikId: l.pemilik_id || l.pemilikId,
+    verifikatorId: l.verifikator_id || l.verifikatorId,
+    tanggalVerifikasi: l.tanggal_verifikasi || l.tanggalVerifikasi,
+    alasanDitolak: l.alasan_ditolak || l.alasanDitolak,
+  };
+}
 
 export default function VerifikasiLahan() {
   const { currentUser } = useAuth();
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState('pending');
   const [filterWilayah, setFilterWilayah] = useState('');
   const [filterJenis, setFilterJenis] = useState('');
@@ -37,7 +50,7 @@ export default function VerifikasiLahan() {
     fetchLahan().catch(() => {});
   }, [fetchLahan]);
 
-  const lahanList = Array.isArray(lahanData) ? lahanData : [];
+  const lahanList = (Array.isArray(lahanData) ? lahanData : []).map(normalizeLahan);
 
   const counts = useMemo(() => ({
     pending: lahanList.filter(l => l.status_verifikasi === 'pending' || l.statusVerifikasi === 'pending').length,
@@ -74,7 +87,7 @@ export default function VerifikasiLahan() {
         await terimaLahan(selectedLahan.id, { catatan: catatanVerifikasi });
         toast.success('Lahan berhasil diverifikasi');
       } else {
-        await tolakLahan(selectedLahan.id, { catatan: alasanPenolakan });
+        await tolakLahan(selectedLahan.id, { alasan: alasanPenolakan || 'Ditolak oleh BPP' });
         toast.success('Lahan berhasil ditolak');
       }
       fetchLahan();
